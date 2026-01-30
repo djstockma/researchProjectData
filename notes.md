@@ -30,3 +30,4 @@ Overview - mini-SWE-agent documentation
 2. Figure out what "scaling" means for said model. Visualize and define this (might change later as I move on)
 3. Try simple benchmarks / measuring efficiency, resource use etc. Define also here what we actually want to look at / study
 
+*** To figure out: how to take docker SWE benchmark and run in apptainer / on lumi

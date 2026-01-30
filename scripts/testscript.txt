@@ -1,0 +1,13 @@
+#!/bin/bash
+#SBATCH --job-name=hello
+#SBATCH --account=project_462001047
+#SBATCH --time=00:01:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=100M
+#SBATCH --partition=small
+
+echo "Hello from LUMI!"
+hostname
+date

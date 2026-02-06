@@ -31,3 +31,25 @@ Overview - mini-SWE-agent documentation
 3. Try simple benchmarks / measuring efficiency, resource use etc. Define also here what we actually want to look at / study
 
 *** To figure out: how to take docker SWE benchmark and run in apptainer / on lumi
+
+
+# Meeting 6.2
+
+## Progress:
+* Ran mini-SWE and SWE-Bench locally 
+
+
+## Next: 
+* How to scale
+* Defining scope
+* How to run
+* Using models
+
+* Running a model on LUMI: lumi has preconfigured pytorch container
+  * Starting with 
+
+* Ask about collaboration
+
+* Do it as a jupyter notebook job
+
+* Goal: reduce end-2-end-latency for larger benchmark

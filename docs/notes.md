@@ -46,7 +46,7 @@ Overview - mini-SWE-agent documentation
 * Using models
 
 * Running a model on LUMI: lumi has preconfigured pytorch container
-  * Starting with 
+  * Starting with [GLM 4.7 flash](https://huggingface.co/zai-org/GLM-4.7-Flash)
 
 * Ask about collaboration
 

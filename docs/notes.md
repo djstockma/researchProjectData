@@ -53,3 +53,38 @@ Overview - mini-SWE-agent documentation
 * Do it as a jupyter notebook job
 
 * Goal: reduce end-2-end-latency for larger benchmark
+
+
+## 12.2
+have to use ssh instead of web cli. Goal: get model running locally!
+
+Status:
+### LUMI PyTorch GPU Test Summary
+
+* Loaded the correct LUMI software stack and CSC PyTorch Singularity module:
+
+  ```bash
+  module load LUMI/25.03
+  module use /appl/local/csc/modulefiles/
+  module load pytorch
+  ```
+* Created a simple PyTorch test script (`test_gpu.py`) that checks GPU availability and performs a small computation on the GPU.
+* Submitted the script as a Slurm job from the login node using:
+
+  ```bash
+  salloc -N1 -p standard-g -t 00:10:00
+  srun -N1 -n1 --gpus 1 python3 test_gpu.py
+  ```
+* Verified the job ran successfully on a GPU node by checking the output file:
+
+  ```text
+  PyTorch version: 2.7.1+rocm6.2.4
+  CUDA available: True
+  Number of GPUs detected: 1
+  Random tensor on GPU:
+  tensor([...], device='cuda:0')
+  ```
+* Confirmed that PyTorch can access the GPU and execute computations inside the CSC Singularity container.
+
+Next step: adapt this workflow to run an actual training model on LUMI.
+

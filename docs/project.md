@@ -45,7 +45,7 @@ Goal pipeline:
 
 ```
 [ LLM Model on LUMI ]
-        ↓
+        ↓↑
 [ (Fake → Real) Coding Agent ]
         ↓
 [ Patch / Diff Artifact ]
@@ -72,24 +72,19 @@ Key design principles:
   * SWE-BENCH evaluates correctness
   * Identified agent–benchmark impedance mismatch and the need for glue code
 
+***NEW:***
+* Running lightweight model (GLM 4.7 flash) on LUMI, GPU allocation
+
 ### WIP
-* Clarified research direction and goals
+* (Clarified research direction and goal)
+* Try model with agent prompts. Alternatively, run model + agent?
+* Check the format of output, make sure it generates "working" patches
 
 ### Next steps
-* Try out lightweight model locally [GLM 4.7 flash](https://huggingface.co/zai-org/GLM-4.7-Flash)
-* Set up said model to run with predefined prompts on LUMI container
-* GEt model to generate patches on LUMI. Aka Run a minimal SLURM job that:
-  * Loads the model
-  * Processes a single prompt
-  * Writes output to file
-
-#### Later:
-* Port agent on to lumi as well
 * Use SWE-BENCH-style task descriptions as prompts. Study:
   * Output format
   * Diff-like behavior
   * Runtime and GPU utilization
-* Convert model outputs into valid SWE-BENCH patches
 * Run official SWE-BENCH evaluation
 * Establish a baseline for local inference vs API-based models
 
@@ -101,13 +96,12 @@ Potential extensions (not committed yet):
 
 * Multi-agent sampling per task
 * Throughput-oriented batching strategies
-* Cost / performance comparison against hosted APIs
 * Studying diminishing returns of scaling
 * Running controlled scaling experiments using SLURM job arrays
 
 ---
 
-## 6. Current questios / Blockers
+## 6. Current questions / Blockers
 
 
 

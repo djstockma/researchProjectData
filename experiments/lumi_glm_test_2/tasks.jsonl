@@ -1,0 +1,1 @@
+{"id":"fib_fix","description":"Fix fibonacci so it returns the standard sequence with fibonacci(0)=0 and fibonacci(1)=1. Keep error handling for negative input.","repo_path":"mini_repo","files":["math_utils.py"],"test_command":"python3 -m unittest discover -s tests -p 'test_*.py'"}

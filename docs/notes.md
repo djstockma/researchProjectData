@@ -88,3 +88,14 @@ Status:
 
 Next step: adapt this workflow to run an actual training model on LUMI.
 
+
+## Workflow for lumi
+
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519_lumi
+
+rsync -av --exclude 'runs/' \
+  -e "ssh -i ~/.ssh/id_ed25519_lumi" \
+  /home/jens/researchProjectData/experiments/lumi_glm_test_2/ \
+  stockmj@lumi.csc.fi:/scratch/project_462001047/stockmj/lumi_glm_test_2/
+

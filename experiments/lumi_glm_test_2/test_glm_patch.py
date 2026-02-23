@@ -49,9 +49,7 @@ def build_prompt(task, repo_root):
         "Return a unified diff ONLY between PATCH_START and PATCH_END.\n"
         "Use standard unified diff headers (--- and +++).\n"
         "Do not include explanations, code fences, or extra text.\n"
-        "Do not repeat the prompt.\n"
         "Use real newlines, not escaped \\n sequences.\n"
-        "Paths must be relative to the repo root without a/ or b/ prefixes.\n"
         "Output format:\nPATCH_START\n<diff>\nPATCH_END\n"
     )
     example = (
@@ -68,7 +66,6 @@ def build_prompt(task, repo_root):
         f"{instructions}\n"
         f"{example}\n"
         f"Task: {task['description']}\n\n"
-        f"Tests to run: {task['test_command']}\n\n"
         f"Files:\n{files_text}\n"
         "PATCH_START\n"
     )
@@ -129,9 +126,12 @@ def generate_patch_local(model, tokenizer, prompt, max_new_tokens, device):
     outputs = model.generate(
         **inputs,
         max_new_tokens=max_new_tokens,
-        do_sample=False,
-        temperature=0.0,
+        do_sample=True,
+        temperature=0.7,
+        top_p=1.0,
+        min_p=0.01,
         eos_token_id=tokenizer.eos_token_id,
+        pad_token_id=tokenizer.eos_token_id,
     )
     decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return decoded

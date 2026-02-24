@@ -69,12 +69,6 @@ Status:
   module load pytorch
   ```
 * Created a simple PyTorch test script (`test_gpu.py`) that checks GPU availability and performs a small computation on the GPU.
-* Submitted the script as a Slurm job from the login node using:
-
-  ```bash
-  salloc -N1 -p standard-g -t 00:10:00
-  srun -N1 -n1 --gpus 1 python3 test_gpu.py
-  ```
 * Verified the job ran successfully on a GPU node by checking the output file:
 
   ```text
@@ -98,4 +92,10 @@ rsync -av --exclude 'runs/' \
   -e "ssh -i ~/.ssh/id_ed25519_lumi" \
   /home/jens/researchProjectData/experiments/lumi_glm_test_2/ \
   stockmj@lumi.csc.fi:/scratch/project_462001047/stockmj/lumi_glm_test_2/
+
+# Experiment 3 (interactive agent)
+rsync -av --exclude 'runs/' \
+  -e "ssh -i ~/.ssh/id_ed25519_lumi" \
+  /home/jens/researchProjectData/experiments/lumi_glm_test_3/ \
+  stockmj@lumi.csc.fi:/scratch/project_462001047/stockmj/lumi_glm_test_3/
 

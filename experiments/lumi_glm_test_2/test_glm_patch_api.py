@@ -1,10 +1,4 @@
 import os
-
-# Set environment variables before importing HF libraries to suppress progress bars
-os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
-os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
-os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
-
 import argparse
 import json
 import shutil
@@ -12,15 +6,11 @@ import subprocess
 import tempfile
 import time
 from datetime import datetime, timezone
-
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
-
+from openai import OpenAI
 
 def read_file(path):
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
-
 
 def load_tasks(path):
     tasks = []
@@ -33,7 +23,6 @@ def load_tasks(path):
             tasks.append(task)
     return tasks
 
-
 def build_prompt(task, repo_root):
     file_blocks = []
     for rel_path in task["files"]:
@@ -42,7 +31,6 @@ def build_prompt(task, repo_root):
         file_blocks.append(
             f"--- path: {rel_path}\n{content}\n--- end: {rel_path}\n"
         )
-
     files_text = "\n".join(file_blocks)
     instructions = (
         "You are an automated patch generator.\n"
@@ -74,7 +62,6 @@ def build_prompt(task, repo_root):
     )
     return prompt
 
-
 def extract_patch(text):
     cleaned = text.strip()
     if cleaned.startswith("```"):
@@ -93,15 +80,18 @@ def extract_patch(text):
         return cleaned
     return ""
 
-
 def apply_patch(repo_root, patch_text):
     if not patch_text.strip():
         return False, "Empty patch"
-
+    # Remove 'a/' and 'b/' prefixes from patch paths
+    import re
+    def strip_ab_prefix(line):
+        return re.sub(r'^(---|\+\+\+) [ab]/', r'\1 ', line)
+    patch_lines = [strip_ab_prefix(l) for l in patch_text.splitlines()]
+    cleaned_patch = "\n".join(patch_lines)
     with tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8") as tmp:
-        tmp.write(patch_text)
+        tmp.write(cleaned_patch)
         tmp_path = tmp.name
-
     try:
         result = subprocess.run(
             ["patch", "-p0", "-i", tmp_path],
@@ -116,7 +106,6 @@ def apply_patch(repo_root, patch_text):
     finally:
         os.unlink(tmp_path)
 
-
 def run_tests(repo_root, command):
     result = subprocess.run(
         command,
@@ -128,37 +117,6 @@ def run_tests(repo_root, command):
     )
     return result.returncode == 0, result.stdout + result.stderr
 
-
-def generate_patch_local(model, tokenizer, max_new_tokens, device):
-    def run_single(prompt):
-        # Use chat template as recommended by Hugging Face for GLM-4.7-Flash
-        messages = [{"role": "user", "content": prompt}]
-        inputs = tokenizer.apply_chat_template(
-            messages,
-            tokenize=True,
-            add_generation_prompt=True,
-            return_dict=True,
-            return_tensors="pt",
-        )
-        inputs = inputs.to(device)
-        outputs = model.generate(
-            **inputs,
-            max_new_tokens=max_new_tokens,
-            do_sample=True,
-            temperature=0.0,
-            top_p=1.0,
-            min_p=0.01,
-            repetition_penalty=1.0,
-            eos_token_id=tokenizer.eos_token_id,
-            pad_token_id=tokenizer.eos_token_id,
-        )
-        # Only decode the newly generated tokens
-        generated_ids = outputs[0][inputs.input_ids.shape[1]:]
-        decoded = tokenizer.decode(generated_ids, skip_special_tokens=True)
-        return decoded
-    return run_single
-
-
 def generate_patch_api(client, model_name, prompt, max_new_tokens):
     completion = client.chat.completions.create(
         model=model_name,
@@ -169,15 +127,14 @@ def generate_patch_api(client, model_name, prompt, max_new_tokens):
     )
     return completion.choices[0].message.content or ""
 
-
-def run_task(task, generator, args):
+def run_task(task, client, args):
     run_id = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     work_root = os.path.join(args.work_dir, f"{task['id']}_{run_id}")
     repo_copy = os.path.join(work_root, "repo")
     os.makedirs(work_root, exist_ok=True)
-
     shutil.copytree(task["repo_path"], repo_copy)
-
+    attempt = 0
+    last_error = ""
     def is_valid_patch(patch):
         patch = patch.strip()
         if not patch:
@@ -188,8 +145,6 @@ def run_task(task, generator, args):
             return False
         return True
 
-    attempt = 0
-    last_error = ""
     while attempt <= args.max_retries:
         attempt += 1
         prompt = build_prompt(task, repo_copy)
@@ -199,8 +154,7 @@ def run_task(task, generator, args):
                 f"{last_error}\n\n"
                 "PATCH_START\n"
             )
-
-        decoded = generator(prompt)
+        decoded = generate_patch_api(client, args.model, prompt, args.max_new_tokens)
         output_path = os.path.join(work_root, f"model_output_attempt_{attempt}.txt")
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(decoded)
@@ -217,7 +171,7 @@ def run_task(task, generator, args):
         # Log patch text for inspection
         patch_log_path = os.path.join(work_root, f"patch_attempt_{attempt}.diff")
         with open(patch_log_path, "w", encoding="utf-8") as f:
-            f.write(patch_text or "")
+            f.write(patch_text)
         print(f"\n--- Patch attempt {attempt} ---\n{patch_text}\n--- End patch ---\n")
         if not is_valid_patch(patch_text):
             last_error = "Patch validation failed: Patch is not a valid unified diff."
@@ -230,71 +184,44 @@ def run_task(task, generator, args):
         if tests_ok:
             return True, apply_log, test_log, work_root
         last_error = f"Tests failed:\n{test_log}"
-
     return False, last_error, "", work_root
-
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--tasks", required=True)
-    parser.add_argument("--model", default="zai-org/GLM-4.7-Flash")
+    parser.add_argument("--model", default="zai-org/GLM-4.7-Flash:novita")
     parser.add_argument("--max-new-tokens", type=int, default=800)
     parser.add_argument("--max-retries", type=int, default=1)
     parser.add_argument("--work-dir", default="runs")
-    parser.add_argument("--use-api", action="store_true")
     parser.add_argument("--api-base-url", default="https://router.huggingface.co/v1")
     args = parser.parse_args()
-
-    args.device = "cuda" if torch.cuda.is_available() else "cpu"
-    print("Device:", args.device)
-
-    generator = None
-    if args.use_api:
-        hf_token = os.environ.get("HF_TOKEN")
-        if not hf_token:
-            raise SystemExit("HF_TOKEN is required when using --use-api")
-        from openai import OpenAI
-
-        client = OpenAI(base_url=args.api_base_url, api_key=hf_token)
-
-        def generator(prompt):
-            return generate_patch_api(client, args.model, prompt, args.max_new_tokens)
-    else:
-        load_start = time.perf_counter()
-        tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
-        model = AutoModelForCausalLM.from_pretrained(
-            args.model,
-            trust_remote_code=True,
-            torch_dtype=torch.float16,
-        ).to(args.device)
-        load_seconds = time.perf_counter() - load_start
-        print(f"Model load time: {load_seconds:.2f}s")
-
-        generator = generate_patch_local(model, tokenizer, args.max_new_tokens, args.device)
-
+    hf_token = os.environ.get("HF_TOKEN")
+    if not hf_token:
+        raise SystemExit("HF_TOKEN is required for API mode")
+    client = OpenAI(base_url=args.api_base_url, api_key=hf_token)
     tasks = load_tasks(args.tasks)
     if not tasks:
         raise SystemExit("No tasks found")
-
     tasks_dir = os.path.dirname(os.path.abspath(args.tasks))
     for task in tasks:
         repo_path = task.get("repo_path", "")
         if repo_path and not os.path.isabs(repo_path):
             task["repo_path"] = os.path.join(tasks_dir, repo_path)
-
     for task in tasks:
         print(f"\n=== Task {task['id']} ===")
         task_start = time.perf_counter()
-        ok, apply_log, test_log, work_root = run_task(task, generator, args)
+        ok, apply_log, test_log, work_root = run_task(task, client, args)
         task_seconds = time.perf_counter() - task_start
-        print(f"Result: {'PASS' if ok else 'FAIL'}")
+        if ok:
+            print("Result: PASS")
+        else:
+            print("Result: FAIL")
         print(f"Task time: {task_seconds:.2f}s")
         print("Work dir:", work_root)
         if apply_log:
             print("Apply log:\n", apply_log)
         if test_log:
             print("Test log:\n", test_log)
-
 
 if __name__ == "__main__":
     main()

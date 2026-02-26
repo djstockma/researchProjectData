@@ -171,9 +171,9 @@ Each job loads the model once (~520s) and then processes its batch of tasks sequ
 SWE-bench tasks each require a specific Python environment and repo state. The original benchmark uses per-task Docker images (`swebench/sweb.eval.x86_64.<instance_id>`), but LUMI does not support Docker.
 
 Planned approach:
-- Pull a single base image: `apptainer pull docker://swebench/sweb.base.x86_64`
+- Pull a single base image: `singularity pull docker://swebench/sweb.base.x86_64`
 - Clone the task repo at `base_commit` into a bind-mounted directory
-- Run agent commands via: `apptainer exec --bind <repo>:/testbed <image.sif> bash -c "cd /testbed && <cmd>"`
+- Run agent commands via: `singularity exec --bind <repo>:/testbed <image.sif> bash -c "cd /testbed && <cmd>"`
 
 This replaces the bare `subprocess` call in `test_glm_agent.py:run_command()`.
 

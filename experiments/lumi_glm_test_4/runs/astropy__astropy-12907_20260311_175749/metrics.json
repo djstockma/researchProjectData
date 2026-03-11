@@ -1,0 +1,12 @@
+{
+  "task_id": "astropy__astropy-12907",
+  "docker_image": "ghcr.io/epoch-research/swe-bench.eval.x86_64.astropy__astropy-12907:latest",
+  "start_time": "2026-03-11T17:57:49.259318+00:00",
+  "model_time_total": 201.44797464367002,
+  "exec_time_total": 4.348593043163419,
+  "steps": 20,
+  "submitted": false,
+  "tests_passed": false,
+  "step_log": [],
+  "total_wall_time": 205.79656768683344
+}

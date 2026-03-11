@@ -102,20 +102,27 @@ Key design principles:
 | `lumi_glm_test_3` | Interactive agent loop (mini-SWE-agent style), API | PASS in 10 steps, 19s |
 | `lumi_glm_test_3` | Same, local GPU on LUMI | PASS in 6 steps, 520s + 520s model load |
 | SWE-bench Lite | Dataset explored, task format understood, sample file created | 300 real tasks ready |
+| `lumi_glm_test_4` | Agent on real SWE-bench tasks, API mode, 3 tasks | Pipeline fully working; 1/2 evaluable tasks solved* — see `experiments/lumi_glm_test_4/README.md` |
 
-**Key finding:** Local GPU inference takes ~87s/step vs ~2s/step via API. Model load is a one-time 520s cost that amortizes across many tasks.
+*astropy-14365 solved correctly in 4/4 runs (re.IGNORECASE fix), but unevaluable due to SWE-bench quirk. astropy-12907 not solved (hit 20-step limit). django-10914 incomplete (API credits ran out).
 
-### In Progress
+**Key findings from experiment 4:**
+- Sandbox approach solved nested Singularity: extract SIF to `/tmp` (local NVMe) at job start — minutes vs 1+ hour on Lustre
+- Agent consistently finds correct fixes for straightforward bugs (astropy-14365: 4/4)
+- GLM-4.7-Flash (MoE) crashes on LUMI's AMD MI300X: `torch._grouped_mm` not supported on ROCm
+- HF free-tier API: ~10s/step (rate-limited), credits exhausted after ~2.5 tasks
 
-* Integrating real SWE-bench tasks into the agent harness
-* Solving the Apptainer environment problem on LUMI (see blockers)
+### In Progress / Blocked
+
+* **ROCm grouped GEMM** — GLM-4.7-Flash MoE inference crashes on AMD MI300X (`torch._grouped_mm` not supported). Options: monkey-patch fallback, switch to non-MoE model, or wait for ROCm support.
+* **API credits** — HF free tier exhausted. Need paid credits or alternative provider.
 
 ### Next Steps
 
-1. **Apptainer on LUMI** — run agent commands inside a sandboxed container with the correct repo + dependencies
-2. **Run one real SWE-bench task end-to-end** on LUMI
-3. **Establish baseline** — pass rate on a small sample (e.g. 10 tasks), local GPU vs API
-4. **Parallelism** — run multiple tasks concurrently via SLURM job arrays
+1. **Fix GPU inference** — resolve ROCm grouped GEMM issue to enable local model runs
+2. **Run full baseline** — 3 tasks with both API and GPU, compare pass rate and speed
+3. **Parallelism** — run multiple tasks concurrently via SLURM job arrays (the core scaling experiment)
+4. **More tasks** — scale to 10–30 tasks for statistically meaningful pass rate
 
 ---
 
@@ -129,10 +136,9 @@ flowchart LR
 
     subgraph LUMI ["LUMI — SLURM job array"]
         direction TB
-        J1["Job 1 — GPU 1: Task 1–30 🤖 Agent + 🧠 Model"]
-        J2["Job 2 — GPU 2: Task 31–60 🤖 Agent + 🧠 Model"]
-        J3["Job 3 — GPU 3: Task 61–90 🤖 Agent + 🧠 Model"]
-        JN["Job N — GPU N: ... 🤖 Agent + 🧠 Model"]
+        J1["Job 1 — GPU 1: Task 1–100 🤖 Agent + 🧠 Model"]
+        J2["Job 2 — GPU 2: Task 101–200 🤖 Agent + 🧠 Model"]
+        J3["Job 3 — GPU 3: Task 201–300 🤖 Agent + 🧠 Model"]
     end
 
     RESULTS["All patches collected"]
@@ -141,26 +147,21 @@ flowchart LR
     SWE -->|"split tasks"| J1
     SWE --> J2
     SWE --> J3
-    SWE --> JN
     J1 --> RESULTS
     J2 --> RESULTS
     J3 --> RESULTS
-    JN --> RESULTS
     RESULTS --> EVAL
 ```
 
-**What we are studying:** How does throughput (tasks solved per hour) and quality (pass rate) change as we add more parallel jobs? Where do diminishing returns appear — GPU utilization, I/O, model loading overhead?
+**What we are studying:** How does throughput (tasks solved per hour) change as we add more parallel jobs? Where do diminishing returns appear — GPU utilization, I/O, model loading overhead?
 
-Each job loads the model once (~520s) and then processes its batch of tasks sequentially, so more jobs = more GPUs used = faster total wall time.
+Each job loads the model once (~520s on dev-g) and then processes its batch of tasks sequentially, so more jobs = more GPUs used = faster total wall time.
 
 ---
 
-## 7. Optional Long-Term Directions
+## 7. Optionals
 
 * Multi-agent sampling per task (run N agents, take best patch)
-* Throughput-oriented batching strategies
-* Studying diminishing returns of scaling
-* Running controlled scaling experiments using SLURM job arrays
 
 ---
 

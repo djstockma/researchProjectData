@@ -1,0 +1,17 @@
+<frozen importlib._bootstrap>:228: RuntimeWarning: numpy.ndarray size changed, may indicate binary incompatibility. Expected 80 from C header, got 96 from PyObject
+ERROR: not found: /pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_4/runs/astropy__astropy-12907_20260311_175749/testbed/astropy/modeling/tests/test_separable.py::test_separable[compound_model6-result6]
+(no name '/pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_4/runs/astropy__astropy-12907_20260311_175749/testbed/astropy/modeling/tests/test_separable.py::test_separable[compound_model6-result6]' in any of [<DocTestModulePlus astropy/modeling/tests/test_separable.py>, <Module astropy/modeling/tests/test_separable.py>])
+
+ERROR: not found: /pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_4/runs/astropy__astropy-12907_20260311_175749/testbed/astropy/modeling/tests/test_separable.py::test_separable[compound_model9-result9]
+(no name '/pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_4/runs/astropy__astropy-12907_20260311_175749/testbed/astropy/modeling/tests/test_separable.py::test_separable[compound_model9-result9]' in any of [<DocTestModulePlus astropy/modeling/tests/test_separable.py>, <Module astropy/modeling/tests/test_separable.py>])
+
+ERROR: not found: /pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_4/runs/astropy__astropy-12907_20260311_175749/testbed/astropy/modeling/tests/test_separable.py::test_separable[compound_model7-result7]
+(no name '/pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_4/runs/astropy__astropy-12907_20260311_175749/testbed/astropy/modeling/tests/test_separable.py::test_separable[compound_model7-result7]' in any of [<DocTestModulePlus astropy/modeling/tests/test_separable.py>, <Module astropy/modeling/tests/test_separable.py>])
+
+ERROR: not found: /pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_4/runs/astropy__astropy-12907_20260311_175749/testbed/astropy/modeling/tests/test_separable.py::test_separable[compound_model8-result8]
+(no name '/pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_4/runs/astropy__astropy-12907_20260311_175749/testbed/astropy/modeling/tests/test_separable.py::test_separable[compound_model8-result8]' in any of [<DocTestModulePlus astropy/modeling/tests/test_separable.py>, <Module astropy/modeling/tests/test_separable.py>])
+
+Internet access disabled
+
+no tests ran in 0.34s
+bash: /tmp/swe_glm_16665957/astropy__astropy-12907/opt/miniconda3/envs/testbed/lib/libtinfo.so.6: no version information available (required by bash)

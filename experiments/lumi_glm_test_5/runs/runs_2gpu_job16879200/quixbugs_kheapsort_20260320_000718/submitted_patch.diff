@@ -1,0 +1,13 @@
+diff --git a/python_programs/kheapsort.py b/python_programs/kheapsort.py
+index 967926d..eb7e43f 100644
+--- a/python_programs/kheapsort.py
++++ b/python_programs/kheapsort.py
+@@ -4,7 +4,7 @@ def kheapsort(arr, k):
+     heap = arr[:k]
+     heapq.heapify(heap)
+ 
+-    for x in arr:
++    for x in arr[k:]:
+         yield heapq.heappushpop(heap, x)
+ 
+     while heap:

@@ -1,0 +1,13 @@
+diff --git a/python_programs/knapsack.py b/python_programs/knapsack.py
+index 493c2d3..cd11bf7 100644
+--- a/python_programs/knapsack.py
++++ b/python_programs/knapsack.py
+@@ -10,7 +10,7 @@ def knapsack(capacity, items):
+             memo[i, j] = memo[i - 1, j]
+ 
+             if weight < j:
+-                memo[i, j] = max(
++                memo[i - 1, j] = max(
+                     memo[i, j],
+                     value + memo[i - 1, j - weight]
+                 )

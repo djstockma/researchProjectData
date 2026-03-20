@@ -1,0 +1,9 @@
+{
+  "model": "zai-org/GLM-4.7-Flash",
+  "use_api": false,
+  "model_load_time_s": 1312.6935213720426,
+  "step_limit": 15,
+  "max_new_tokens": 1000,
+  "session_start": "2026-03-19T21:24:27.871403+00:00",
+  "task_count": 40
+}

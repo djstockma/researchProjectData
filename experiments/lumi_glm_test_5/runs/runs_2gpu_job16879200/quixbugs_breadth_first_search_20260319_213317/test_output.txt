@@ -1,0 +1,15 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0 -- /opt/venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_5/runs/quixbugs_breadth_first_search_20260319_213317/repo
+plugins: anyio-4.12.1, asyncio-1.3.0, zarr-3.1.5
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 5 items
+
+python_testcases/test_breadth_first_search.py::test1 PASSED              [ 20%]
+python_testcases/test_breadth_first_search.py::test2 PASSED              [ 40%]
+python_testcases/test_breadth_first_search.py::test3 PASSED              [ 60%]
+python_testcases/test_breadth_first_search.py::test4 PASSED              [ 80%]
+python_testcases/test_breadth_first_search.py::test5 PASSED              [100%]
+
+============================== 5 passed in 0.03s ===============================

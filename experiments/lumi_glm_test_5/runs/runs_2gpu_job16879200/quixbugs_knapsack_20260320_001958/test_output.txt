@@ -1,0 +1,76 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0 -- /opt/venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_5/runs/quixbugs_knapsack_20260320_001958/repo
+plugins: anyio-4.12.1, asyncio-1.3.0, zarr-3.1.5
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 10 items
+
+python_testcases/test_knapsack.py::test_knapsack[input_data0-19] FAILED  [ 10%]
+python_testcases/test_knapsack.py::test_knapsack[input_data1-30] FAILED  [ 20%]
+python_testcases/test_knapsack.py::test_knapsack[input_data2-1458] FAILED [ 30%]
+python_testcases/test_knapsack.py::test_knapsack[input_data3-51] FAILED  [ 40%]
+python_testcases/test_knapsack.py::test_knapsack[input_data4-107] FAILED [ 50%]
+python_testcases/test_knapsack.py::test_knapsack[input_data5-150] FAILED [ 60%]
+python_testcases/test_knapsack.py::test_knapsack[input_data6-900] FAILED [ 70%]
+python_testcases/test_knapsack.py::test_knapsack[input_data7-309] FAILED [ 80%]
+python_testcases/test_knapsack.py::test_knapsack[input_data8-1735] FAILED [ 90%]
+python_testcases/test_knapsack.py::test_knapsack[input_data9-13549094] SKIPPED [100%]
+
+=================================== FAILURES ===================================
+________________________ test_knapsack[input_data0-19] _________________________
+python_testcases/test_knapsack.py:45: in test_knapsack
+    assert knapsack(*input_data) == expected
+E   assert 0 == 19
+E    +  where 0 = knapsack(*[100, [[60, 10], [50, 8], [20, 4], [20, 4], [8, 3], [3, 2]]])
+________________________ test_knapsack[input_data1-30] _________________________
+python_testcases/test_knapsack.py:45: in test_knapsack
+    assert knapsack(*input_data) == expected
+E   assert 0 == 30
+E    +  where 0 = knapsack(*[40, [[30, 10], [50, 5], [10, 20], [40, 25]]])
+_______________________ test_knapsack[input_data2-1458] ________________________
+python_testcases/test_knapsack.py:45: in test_knapsack
+    assert knapsack(*input_data) == expected
+E   assert 0 == 1458
+E    +  where 0 = knapsack(*[750, [[70, 135], [73, 139], [77, 149], [80, 150], [82, 156], [87, 163], ...]])
+________________________ test_knapsack[input_data3-51] _________________________
+python_testcases/test_knapsack.py:45: in test_knapsack
+    assert knapsack(*input_data) == expected
+E   assert 0 == 51
+E    +  where 0 = knapsack(*[26, [[12, 24], [7, 13], [11, 23], [8, 15], [9, 16]]])
+________________________ test_knapsack[input_data4-107] ________________________
+python_testcases/test_knapsack.py:45: in test_knapsack
+    assert knapsack(*input_data) == expected
+E   assert 0 == 107
+E    +  where 0 = knapsack(*[50, [[31, 70], [10, 20], [20, 39], [19, 37], [4, 7], [3, 5], ...]])
+________________________ test_knapsack[input_data5-150] ________________________
+python_testcases/test_knapsack.py:45: in test_knapsack
+    assert knapsack(*input_data) == expected
+E   assert 0 == 150
+E    +  where 0 = knapsack(*[190, [[56, 50], [59, 50], [80, 64], [64, 46], [75, 50], [17, 5]]])
+________________________ test_knapsack[input_data6-900] ________________________
+python_testcases/test_knapsack.py:45: in test_knapsack
+    assert knapsack(*input_data) == expected
+E   assert 0 == 900
+E    +  where 0 = knapsack(*[104, [[25, 350], [35, 400], [45, 450], [5, 20], [25, 70], [3, 8], ...]])
+________________________ test_knapsack[input_data7-309] ________________________
+python_testcases/test_knapsack.py:45: in test_knapsack
+    assert knapsack(*input_data) == expected
+E   assert 0 == 309
+E    +  where 0 = knapsack(*[165, [[23, 92], [31, 57], [29, 49], [44, 68], [53, 60], [38, 43], ...]])
+_______________________ test_knapsack[input_data8-1735] ________________________
+python_testcases/test_knapsack.py:45: in test_knapsack
+    assert knapsack(*input_data) == expected
+E   assert 0 == 1735
+E    +  where 0 = knapsack(*[170, [[41, 442], [50, 525], [49, 511], [59, 593], [55, 546], [57, 564], ...]])
+=========================== short test summary info ============================
+FAILED python_testcases/test_knapsack.py::test_knapsack[input_data0-19] - ass...
+FAILED python_testcases/test_knapsack.py::test_knapsack[input_data1-30] - ass...
+FAILED python_testcases/test_knapsack.py::test_knapsack[input_data2-1458] - a...
+FAILED python_testcases/test_knapsack.py::test_knapsack[input_data3-51] - ass...
+FAILED python_testcases/test_knapsack.py::test_knapsack[input_data4-107] - as...
+FAILED python_testcases/test_knapsack.py::test_knapsack[input_data5-150] - as...
+FAILED python_testcases/test_knapsack.py::test_knapsack[input_data6-900] - as...
+FAILED python_testcases/test_knapsack.py::test_knapsack[input_data7-309] - as...
+FAILED python_testcases/test_knapsack.py::test_knapsack[input_data8-1735] - a...
+========================= 9 failed, 1 skipped in 0.20s =========================

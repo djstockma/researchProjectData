@@ -1,0 +1,18 @@
+{
+  "job_id": 16879200,
+  "date": "2026-03-20",
+  "partition": "standard-g",
+  "gpus": 2,
+  "mem_gb": 160,
+  "wall_time": "4h",
+  "model": "zai-org/GLM-4.7-Flash",
+  "model_load_time_s": 1312.69,
+  "step_limit": 15,
+  "max_new_tokens": 1000,
+  "test_timeout_s": 180,
+  "tasks_completed": 16,
+  "tasks_total": 40,
+  "pass_count": 6,
+  "fail_count": 10,
+  "notes": "ROCm grouped_mm patched. 2 GPUs needed for KV cache. First run with working inference."
+}

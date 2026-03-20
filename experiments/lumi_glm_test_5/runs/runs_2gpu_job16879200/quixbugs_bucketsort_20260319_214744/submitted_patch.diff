@@ -1,0 +1,13 @@
+diff --git a/python_programs/bucketsort.py b/python_programs/bucketsort.py
+index 620e64e..b3f453a 100644
+--- a/python_programs/bucketsort.py
++++ b/python_programs/bucketsort.py
+@@ -4,7 +4,7 @@ def bucketsort(arr, k):
+         counts[x] += 1
+ 
+     sorted_arr = []
+-    for i, count in enumerate(arr):
++    for i, count in enumerate(counts):
+         sorted_arr.extend([i] * count)
+ 
+     return sorted_arr

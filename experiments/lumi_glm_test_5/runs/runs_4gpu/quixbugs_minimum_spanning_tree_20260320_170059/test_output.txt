@@ -1,0 +1,36 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0 -- /opt/venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_5/runs/runs_4gpu/quixbugs_minimum_spanning_tree_20260320_170059/repo
+plugins: anyio-4.12.1, asyncio-1.3.0, zarr-3.1.5
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 3 items
+
+python_testcases/test_minimum_spanning_tree.py::test1 FAILED             [ 33%]
+python_testcases/test_minimum_spanning_tree.py::test2 FAILED             [ 66%]
+python_testcases/test_minimum_spanning_tree.py::test3 FAILED             [100%]
+
+=================================== FAILURES ===================================
+____________________________________ test1 _____________________________________
+python_testcases/test_minimum_spanning_tree.py:14: in test1
+    result = minimum_spanning_tree(
+python_programs/minimum_spanning_tree.py:11: in minimum_spanning_tree
+    for node in group_by_node[v]:
+E   RuntimeError: Set changed size during iteration
+____________________________________ test2 _____________________________________
+python_testcases/test_minimum_spanning_tree.py:31: in test2
+    result = minimum_spanning_tree(
+python_programs/minimum_spanning_tree.py:11: in minimum_spanning_tree
+    for node in group_by_node[v]:
+E   RuntimeError: Set changed size during iteration
+____________________________________ test3 _____________________________________
+python_testcases/test_minimum_spanning_tree.py:54: in test3
+    result = minimum_spanning_tree(
+python_programs/minimum_spanning_tree.py:11: in minimum_spanning_tree
+    for node in group_by_node[v]:
+E   RuntimeError: Set changed size during iteration
+=========================== short test summary info ============================
+FAILED python_testcases/test_minimum_spanning_tree.py::test1 - RuntimeError: ...
+FAILED python_testcases/test_minimum_spanning_tree.py::test2 - RuntimeError: ...
+FAILED python_testcases/test_minimum_spanning_tree.py::test3 - RuntimeError: ...
+============================== 3 failed in 0.17s ===============================

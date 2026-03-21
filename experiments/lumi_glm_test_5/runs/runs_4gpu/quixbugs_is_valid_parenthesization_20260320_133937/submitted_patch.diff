@@ -1,0 +1,13 @@
+diff --git a/python_programs/is_valid_parenthesization.py b/python_programs/is_valid_parenthesization.py
+index a339ac2..580b2a2 100644
+--- a/python_programs/is_valid_parenthesization.py
++++ b/python_programs/is_valid_parenthesization.py
+@@ -9,7 +9,7 @@ def is_valid_parenthesization(parens):
+             if depth < 0:
+                 return False
+ 
+-    return True
++    return depth == 0
+ 
+ 
+ """

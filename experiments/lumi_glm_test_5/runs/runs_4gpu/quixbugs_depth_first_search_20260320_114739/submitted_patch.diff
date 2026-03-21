@@ -1,0 +1,13 @@
+diff --git a/python_programs/depth_first_search.py b/python_programs/depth_first_search.py
+index 72562c8..741c77c 100644
+--- a/python_programs/depth_first_search.py
++++ b/python_programs/depth_first_search.py
+@@ -4,7 +4,7 @@ def depth_first_search(startnode, goalnode):
+     def search_from(node):
+         if node in nodesvisited:
+             return False
+-        elif node is goalnode:
++        elif node == goalnode:
+             return True
+         else:
+             return any(

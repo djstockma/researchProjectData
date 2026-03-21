@@ -1,0 +1,13 @@
+diff --git a/python_programs/gcd.py b/python_programs/gcd.py
+index d0a6618..ee80fd2 100644
+--- a/python_programs/gcd.py
++++ b/python_programs/gcd.py
+@@ -1,6 +1,6 @@
+ def gcd(a, b):
+-    if b == 0:
+-        return a
++    if a % b == 0:
++        return b
+     else:
+         return gcd(a % b, b)
+ 

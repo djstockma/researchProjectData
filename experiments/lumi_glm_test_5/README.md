@@ -168,34 +168,28 @@ rsync -av -e "ssh -i ~/.ssh/id_ed25519_lumi" \
 
 ---
 
-## Current Status (2026-03-20)
+## Results
 
-Two jobs running in parallel on LUMI `standard-g`, both over all 40 QuixBugs tasks:
+### Run summary
 
-| Job | ID | GPUs | Memory | Wall | Output dir |
-|-----|----|------|--------|------|------------|
-| 2 GPU | 16888661 | 2× MI250X (128 GB) | 160G | 8h | `runs/runs_2gpu/` |
-| 4 GPU | 16888703 | 4× MI250X (256 GB) | 256G | 8h | `runs/runs_4gpu/` |
+Three GPU jobs completed on LUMI `standard-g` using GLM-4.7-Flash (local, ROCm).
+Job 16879200 was the initial 4h test run; jobs 16888661 and 16888703 are the main
+2GPU vs 4GPU comparison runs (8h wall each).
 
-**Research question**: does splitting the model across 4 GPUs instead of 2 change inference speed?
-With `device_map="auto"`, more GPUs = more inter-device communication per forward pass.
-The ROCm fallback (sequential MoE routing) may amplify or reduce this effect.
+| Job | GPUs | Wall | Tasks done | PASS | FAIL | Model load | Output dir |
+|-----|------|------|------------|------|------|------------|------------|
+| 16879200 | 2× MI250X | 4h | 16/40 | 6 (38%) | 10 | 22 min | `runs_2gpu_job16879200/` |
+| 16888661 | 2× MI250X | 8h | 24/40 | 10 (42%) | 14 | **37.5 min** | `runs_2gpu/` |
+| 16888703 | 4× MI250X | 8h | 26/40 | 9 (35%) | 17 | **19.7 min** | `runs_4gpu/` |
 
-Fixes applied vs job 16879200:
-- pytest timeout 180s → 30s (was wasting 3 min on infinite-loop bugs)
-- Format error hard reminder injected after 2 consecutive parse failures
-- `repo/` directory deleted after each task (no more file bloat)
-- 8h wall time (was 4h — only reached task 16/40 last time)
+Neither 8h job completed all 40 tasks — a handful of runaway tasks (format error loops,
+long context) consumed a disproportionate share of the wall time budget.
 
 ---
 
-## Results
+### Job 16879200 — Initial run (2GPU, 4h wall)
 
-### GPU run — Job 16879200 (2026-03-20, `standard-g`, 2× AMD MI250X, 4h wall)
-
-**Model load time: 1312s (22 min)**
-
-16 of 40 tasks completed before 4h wall limit. **6 PASS / 10 FAIL (37.5% solve rate).**
+**Model load: 1312s (22 min).** 16/40 tasks before wall limit. 6 PASS / 10 FAIL (38%).
 
 | Task | Result | Steps | Wall (s) | Model (s) | Exec (s) | Setup (s) | Test (s) |
 |------|--------|-------|----------|-----------|----------|-----------|----------|
@@ -216,55 +210,137 @@ Fixes applied vs job 16879200:
 | kth | FAIL | 2 | 213 | 209 | 0.0 | 2.5 | 1.3 |
 | lcs_length | FAIL | 4 | 417 | 413 | 0.0 | 2.5 | 1.4 |
 
-¹ Test timeout: buggy code has infinite recursion → pytest hit 180s limit.
-² `find_in_sorted` burned 2174s with only 1 logged step — model generated 14 unparseable responses (format error loop).
+¹ Test timeout: infinite recursion in buggy code → pytest hit 180s limit (later fixed to 30s).
+² `find_in_sorted` burned 2174s on 1 logged step — 14 consecutive unparseable responses, each
+  costing a full inference call. Format error hard-reminder fix added for subsequent jobs.
 
-### Phase timing summary (16 tasks, job 16879200)
+---
 
-| Phase | Value | Notes |
-|-------|-------|-------|
-| **Model load** | **1313s (22 min)** | One-time per session; ROCm custom op init overhead |
-| **Setup — 1st task** | **97s** | Cold Lustre copy of full quixbugs repo (~200 MB) |
-| **Setup — subsequent** | **2.8s avg** | Warm cache, small delta |
-| **Inference** | **115s/step avg** | ROCm fallback; grows with context (see below) |
-| **Exec** | **1.5s avg total** | Local Python — essentially free |
-| **Test** | **1.5s avg** | When code is correct; 180s cap on infinite loops |
+### Jobs 16888661 vs 16888703 — 2GPU vs 4GPU comparison (8h wall)
 
-#### Inference time grows with context length
+Fixes vs job 16879200: pytest timeout 30s, format hard-reminder after 2 parse failures,
+`repo/` deleted after each task, 8h wall time.
 
-Each agent step appends to the conversation, making the KV cache larger and inference slower:
+**Model load: 2GPU = 2248s (37.5 min), 4GPU = 1182s (19.7 min)**
 
-| Steps in task | Avg inference/step |
-|--------------|-------------------|
-| 2 | ~103s |
-| 3–4 | ~105s |
-| 7–8 | ~107–114s |
-| 12–13 | ~129–139s |
+| Task | 2GPU result | 2GPU wall | 2GPU inf/step | 4GPU result | 4GPU wall | 4GPU inf/step |
+|------|-------------|-----------|---------------|-------------|-----------|---------------|
+| bitcount | **PASS** | 474s | 104s | **PASS** | 500s | 107s |
+| breadth_first_search | FAIL | 764s | 108s | **PASS** | 799s | 113s |
+| bucketsort | **PASS** | 319s | 105s | **PASS** | 327s | 107s |
+| depth_first_search | FAIL | 531s | 104s | FAIL | 535s | 106s |
+| detect_cycle | FAIL | 421s | 103s | FAIL | 428s | 105s |
+| find_first_in_sorted | FAIL | 239s | 103s ² | FAIL | 244s | 106s ² |
+| find_in_sorted | FAIL | **2201s** | — ³ | FAIL | **2308s** | — ³ |
+| flatten | **PASS** | 435s | 106s | **PASS** | 439s | 108s |
+| gcd | **PASS** | 668s | 110s | FAIL | 435s | 107s |
+| get_factors | FAIL | 965s | 119s | FAIL | 1967s | 151s |
+| hanoi | FAIL | 324s | 106s | FAIL | 359s | 109s |
+| is_valid_parenthesization | **PASS** | 1217s | 121s | **PASS** | 1128s | 124s |
+| kheapsort | **PASS** | 763s | 108s | **PASS** | 800s | 113s |
+| knapsack | FAIL | **2220s** | 158s | **PASS** | 1214s | 134s |
+| kth | FAIL | 228s | 106s | FAIL | 220s | 107s |
+| lcs_length | FAIL | 422s | 105s | FAIL | 429s | 106s |
+| levenshtein | FAIL | **2025s** | 403s ³ | FAIL | **2192s** | 435s ³ |
+| lis | FAIL | 431s | 106s | FAIL | 450s | 109s |
+| longest_common_subsequence | FAIL | **2209s** | 315s ³ | FAIL | **2332s** | 179s |
+| max_sublist_sum | **PASS** | 1524s | 126s | FAIL | **2353s** | 578s ³ |
+| mergesort | **PASS** | **2273s** | 376s ³ | **PASS** | 962s | 118s |
+| minimum_spanning_tree | FAIL | 217s | 105s | FAIL | 217s | 107s |
+| next_palindrome | **PASS** | **2069s** | 294s ³ | **PASS** | 919s | 114s |
+| next_permutation | **PASS** | 1619s | 134s | FAIL | 1004s | 125s |
+| pascal | — | — | — | FAIL | **2211s** | — ³ |
+| possible_change | — | — | — | FAIL | **2334s** | — ³ |
 
-This is a direct consequence of the autoregressive KV cache growing with conversation length.
+² `find_first_in_sorted`: 30s pytest timeout hit (buggy infinite recursion).
+³ Abnormally high inference/step — context explosion or format error loop burning tokens.
 
-### Key observations
+---
 
-- **Inference dominates**: model time is 95–99% of task wall time. Exec and test are negligible.
-- **Context growth increases inference cost**: a 13-step task pays ~35% more per step than a 2-step task.
-- **First-task setup is a Lustre cold-copy anomaly** (97s vs 2–5s thereafter) — not representative of steady-state.
-- **Format error loops are expensive**: `find_in_sorted` wasted 2174s with only 1 real step logged — the model generated 14 consecutive unparseable responses, each costing a full inference call (~2170s total wasted).
-- **Test timeouts inflate results**: tasks where the buggy code has infinite recursion hit the 180s pytest cap (`find_first_in_sorted`). These should use a shorter timeout.
-- **Model load slower than expected**: 22 min vs ~9 min in exp3, likely due to ROCm fallback custom op registration at import time and the much larger model (64 GB MoE vs ~12 GB dense in exp3).
-- **Solve rate**: 6/16 PASS (37.5%) on the completed tasks.
+### Phase timing analysis
 
-### Remaining 24 tasks
+#### 2GPU vs 4GPU comparison
 
-Job hit the 4h wall limit during `levenshtein` (task 17). Still to run:
-`levenshtein`, `lis`, `longest_common_subsequence`, `max_sublist_sum`, `mergesort`,
-`minimum_spanning_tree`, `next_palindrome`, `next_permutation`, `pascal`,
-`possible_change`, `powerset`, `quicksort`, `reverse_linked_list`, `rpn_eval`,
-`shortest_path_length`, `shortest_path_lengths`, `shortest_paths`, `shunting_yard`,
-`sieve`, `sqrt`, `subsequences`, `to_base`, `topological_ordering`, `wrap`
+| Phase | 2GPU (job 16888661) | 4GPU (job 16888703) | Notes |
+|-------|---------------------|---------------------|-------|
+| **Model load** | **2248s (37.5 min)** | **1182s (19.7 min)** | 2× faster with 4 GPUs |
+| Setup — 1st task | 27s | 61s | Cold Lustre copy |
+| Setup — subsequent | ~4s avg | ~5s avg | Warm cache |
+| **Inference (normal tasks)** | **~105–110s/step** | **~106–113s/step** | Essentially identical |
+| Exec | ~3s avg total | ~3s avg total | Negligible |
+| Test | ~2s avg | ~2s avg | Negligible (30s cap) |
 
-### Next steps
+#### Inference grows with context
 
-1. Submit follow-up job for remaining 24 tasks (8h wall time or two 4h runs).
-2. Fix format error loops — add a hard format reminder after 2 consecutive parse failures.
-3. Cap pytest timeout to 30s to avoid 180s waits on infinite-loop bugs.
-4. Compile full 40-task timing table and produce phase-breakdown chart for final report.
+Inference time per step scales with KV cache size (accumulated conversation history):
+
+| Steps taken | 2GPU avg inf/step | 4GPU avg inf/step |
+|-------------|-------------------|-------------------|
+| 2–3 | ~104s | ~106s |
+| 4–7 | ~106–110s | ~108–113s |
+| 9–12 | ~120–130s | ~124–134s |
+| 13–14 | ~150–160s | ~150–180s |
+
+A 14-step task pays roughly **50% more per step** than a 2-step task — direct consequence of
+autoregressive KV cache growth.
+
+#### Phase breakdown (% of wall time, normal tasks)
+
+| Phase | Share |
+|-------|-------|
+| LLM inference | 95–99% |
+| Setup | <1% (subsequent tasks) |
+| Exec | <1% |
+| Test | <1% |
+
+**Inference completely dominates.** All other phases are negligible at this model scale.
+
+---
+
+### Key findings
+
+1. **Inference speed is identical across 2 and 4 GPUs (~107s/step for normal tasks).**
+   The ROCm grouped-GEMM fallback serialises MoE expert routing into sequential `torch.mm`
+   calls regardless of how many GPUs are available. Adding more GPUs does not parallelise
+   the bottleneck — it only splits the weight storage.
+
+2. **Model load is 2× faster on 4 GPUs** (19.7 min vs 37.5 min). More VRAM means each chip
+   holds a smaller shard, reducing per-chip IO during weight streaming from the HF cache.
+
+3. **Inference dominates wall time** (95–99%). Setup, exec, and test are negligible at this
+   scale — optimising them would have no meaningful impact on throughput.
+
+4. **Runaway tasks are the main efficiency bottleneck.** A small number of tasks consumed
+   disproportionate wall time:
+   - `find_in_sorted`: 2201s / 2308s for 1 real step — format error loop persists despite fix.
+   - `levenshtein`, `longest_common_subsequence`, `mergesort`, `next_palindrome`,
+     `max_sublist_sum`, `pascal`, `possible_change`: 300–580s/step — severe context explosion.
+   These tasks alone account for most of the unfinished wall time budget.
+
+5. **Neither 8h run completed all 40 tasks** (24/40 and 26/40). A full run of all 40 tasks
+   requires roughly 10–12 GPU-hours at current throughput.
+
+6. **Solve rate is ~37–42%** on completed tasks. The benchmark is non-trivial for this model.
+
+---
+
+### Lessons and next steps
+
+#### What we learned
+
+- The ROCm grouped-GEMM bottleneck means **more GPUs ≠ faster inference** for this model.
+  The only benefit of 4 GPUs is faster model loading. For long batch jobs, 2 GPUs is the
+  more efficient allocation (lower node cost, same throughput).
+- **Context length is the real inference cost driver.** Capping the agent at fewer steps or
+  summarising conversation history would reduce per-step cost more than adding GPUs.
+- **Per-task wall time caps are essential.** A hard 20–30 min ceiling per task would prevent
+  runaway loops from consuming the whole session budget without sacrificing normal tasks.
+- **The pipeline works end-to-end** and produces clean, reproducible timing data at all phases.
+
+#### If the experiment were to continue
+
+- Add a per-task wall-time cap (e.g., 1800s) to prevent runaway tasks stealing budget.
+- Investigate the persistent format error loop on `find_in_sorted` — the hard reminder fix
+  helped most tasks but not this one.
+- To complete all 40 tasks cleanly, submit a 3rd 8h run starting from task 25/27 onwards,
+  or restructure as two back-to-back 8h jobs splitting the task list.

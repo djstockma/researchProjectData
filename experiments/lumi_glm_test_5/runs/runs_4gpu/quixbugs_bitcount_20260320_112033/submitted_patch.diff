@@ -1,0 +1,13 @@
+diff --git a/python_programs/bitcount.py b/python_programs/bitcount.py
+index cc14d0e..7c6c6a9 100644
+--- a/python_programs/bitcount.py
++++ b/python_programs/bitcount.py
+@@ -2,7 +2,7 @@
+ def bitcount(n):
+     count = 0
+     while n:
+-        n ^= n - 1
++        n &= n - 1
+         count += 1
+     return count
+ 

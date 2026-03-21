@@ -1,0 +1,21 @@
+diff --git a/python_programs/next_permutation.py b/python_programs/next_permutation.py
+index 0d69c83..a6e34e3 100644
+--- a/python_programs/next_permutation.py
++++ b/python_programs/next_permutation.py
+@@ -1,4 +1,3 @@
+-
+ def next_permutation(perm):
+     for i in range(len(perm) - 2, -1, -1):
+         if perm[i] < perm[i + 1]:
+@@ -6,9 +5,9 @@ def next_permutation(perm):
+                 if perm[j] < perm[i]:
+                     next_perm = list(perm)
+                     next_perm[i], next_perm[j] = perm[j], perm[i]
+-                    next_perm[i + 1:] = reversed(next_perm[i + 1:])
++                    next_perm[i + 1:] = list(reversed(next_perm[i + 1:]))
+                     return next_perm
+-
++    return list(perm)
+ 
+ 
+ """

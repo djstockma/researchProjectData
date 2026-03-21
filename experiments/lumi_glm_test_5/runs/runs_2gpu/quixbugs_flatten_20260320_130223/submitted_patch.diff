@@ -1,0 +1,18 @@
+diff --git a/python_programs/flatten.py b/python_programs/flatten.py
+index e3e7933..31fede3 100644
+--- a/python_programs/flatten.py
++++ b/python_programs/flatten.py
+@@ -4,7 +4,7 @@ def flatten(arr):
+             for y in flatten(x):
+                 yield y
+         else:
+-            yield flatten(x)
++            yield x
+ 
+ 
+ 
+@@ -27,3 +27,4 @@ Example:
+     >>> list(flatten([[1, [], [2, 3]], [[4]], 5]))
+     [1, 2, 3, 4, 5]
+ """
++

@@ -1,0 +1,13 @@
+diff --git a/python_programs/mergesort.py b/python_programs/mergesort.py
+index 14faff8..bb9434a 100644
+--- a/python_programs/mergesort.py
++++ b/python_programs/mergesort.py
+@@ -14,7 +14,7 @@ def mergesort(arr):
+         result.extend(left[i:] or right[j:])
+         return result
+ 
+-    if len(arr) == 0:
++    if len(arr) <= 1:
+         return arr
+     else:
+         middle = len(arr) // 2

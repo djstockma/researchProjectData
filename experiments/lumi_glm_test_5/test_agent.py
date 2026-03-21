@@ -355,8 +355,12 @@ def run_task(task, generator, args, model_load_time=None):
 
     patch_content = ""
     consecutive_format_errors = 0
+    task_timeout = getattr(args, "task_timeout", None)
     try:
         for step in range(args.step_limit):
+            if task_timeout and (time.perf_counter() - task_start) > task_timeout:
+                print(f"  Task wall-time cap reached ({task_timeout}s), stopping.")
+                break
             # Model inference
             t0 = time.perf_counter()
             response = generator(messages)  # may raise APICreditsExhausted
@@ -473,6 +477,8 @@ def main():
     parser.add_argument("--use-api", action="store_true",
                         help="Use HuggingFace inference router instead of local model")
     parser.add_argument("--api-base-url", default="https://router.huggingface.co/v1")
+    parser.add_argument("--task-timeout", type=int, default=None,
+                        help="Max wall-time per task in seconds. Task is abandoned if exceeded.")
     parser.add_argument("--singularity-sif-dir", default=None,
                         help="Directory containing SWE-bench .sif files. "
                              "If set, uses singularity exec for task commands (LUMI, outside LAIF).")

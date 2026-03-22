@@ -1,0 +1,13 @@
+diff --git a/python_programs/rpn_eval.py b/python_programs/rpn_eval.py
+index b48db47..da82526 100644
+--- a/python_programs/rpn_eval.py
++++ b/python_programs/rpn_eval.py
+@@ -17,7 +17,7 @@ def rpn_eval(tokens):
+             a = stack.pop()
+             b = stack.pop()
+             stack.append(
+-                op(token, a, b)
++                op(token, b, a)
+             )
+ 
+     return stack.pop()

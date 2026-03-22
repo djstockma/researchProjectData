@@ -1,0 +1,72 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0 -- /opt/venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_5/runs/runs_parallel_b/quixbugs_shortest_path_lengths_20260321_145707/repo
+plugins: anyio-4.12.1, asyncio-1.3.0, zarr-3.1.5
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 4 items
+
+python_testcases/test_shortest_path_lengths.py::test1 FAILED             [ 25%]
+python_testcases/test_shortest_path_lengths.py::test2 FAILED             [ 50%]
+python_testcases/test_shortest_path_lengths.py::test3 FAILED             [ 75%]
+python_testcases/test_shortest_path_lengths.py::test4 FAILED             [100%]
+
+=================================== FAILURES ===================================
+____________________________________ test1 _____________________________________
+python_testcases/test_shortest_path_lengths.py:62: in test1
+    assert result == expected
+E   AssertionError: assert defaultdict(<..., (5, 4): -1}) == {(0, 0): 0, (..., 3): 10, ...}
+E     
+E     Omitting 14 identical items, use -vv to show
+E     Differing items:
+E     {(4, 0): 4} != {(4, 0): inf}
+E     {(4, 3): -5} != {(4, 3): inf}
+E     {(5, 4): -1} != {(5, 4): inf}
+E     {(0, 2): -1} != {(0, 2): 3}...
+E     
+E     ...Full output truncated (113 lines hidden), use '-vv' to show
+____________________________________ test2 _____________________________________
+python_testcases/test_shortest_path_lengths.py:104: in test2
+    assert result == expected
+E   AssertionError: assert defaultdict(<...f, (4, 3): 7}) == {(0, 0): 0, (...0, 3): 6, ...}
+E     
+E     Omitting 14 identical items, use -vv to show
+E     Differing items:
+E     {(2, 4): inf} != {(2, 4): 5}
+E     {(0, 4): inf} != {(0, 4): 13}
+E     {(2, 1): 5} != {(2, 1): inf}
+E     {(4, 3): 7} != {(4, 3): inf}...
+E     
+E     ...Full output truncated (65 lines hidden), use '-vv' to show
+____________________________________ test3 _____________________________________
+python_testcases/test_shortest_path_lengths.py:135: in test3
+    assert result == expected
+E   AssertionError: assert defaultdict(<...f, (3, 2): 5}) == {(0, 0): 0, (... 3): inf, ...}
+E     
+E     Omitting 14 identical items, use -vv to show
+E     Differing items:
+E     {(1, 0): 3} != {(1, 0): inf}
+E     {(3, 2): 5} != {(3, 2): inf}
+E     
+E     Full diff:...
+E     
+E     ...Full output truncated (26 lines hidden), use '-vv' to show
+____________________________________ test4 _____________________________________
+python_testcases/test_shortest_path_lengths.py:160: in test4
+    assert result == expected
+E   AssertionError: assert defaultdict(<...3, (2, 1): 1}) == {(0, 0): 0, (...1, 0): 4, ...}
+E     
+E     Omitting 2 identical items, use -vv to show
+E     Differing items:
+E     {(1, 2): 3} != {(1, 2): 5}
+E     {(2, 1): 1} != {(2, 1): 2}
+E     {(0, 0): -2} != {(0, 0): 0}
+E     {(2, 0): -5} != {(2, 0): -1}...
+E     
+E     ...Full output truncated (39 lines hidden), use '-vv' to show
+=========================== short test summary info ============================
+FAILED python_testcases/test_shortest_path_lengths.py::test1 - AssertionError...
+FAILED python_testcases/test_shortest_path_lengths.py::test2 - AssertionError...
+FAILED python_testcases/test_shortest_path_lengths.py::test3 - AssertionError...
+FAILED python_testcases/test_shortest_path_lengths.py::test4 - AssertionError...
+============================== 4 failed in 0.22s ===============================

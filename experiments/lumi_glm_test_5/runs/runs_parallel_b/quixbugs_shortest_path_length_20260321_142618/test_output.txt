@@ -1,0 +1,26 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0 -- /opt/venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /pfs/lustrep4/scratch/project_462001047/stockmj/lumi_glm_test_5/runs/runs_parallel_b/quixbugs_shortest_path_length_20260321_142618/repo
+plugins: anyio-4.12.1, asyncio-1.3.0, zarr-3.1.5
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 4 items
+
+python_testcases/test_shortest_path_length.py::test1 FAILED              [ 25%]
+python_testcases/test_shortest_path_length.py::test2 FAILED              [ 50%]
+python_testcases/test_shortest_path_length.py::test3 PASSED              [ 75%]
+python_testcases/test_shortest_path_length.py::test4 PASSED              [100%]
+
+=================================== FAILURES ===================================
+____________________________________ test1 _____________________________________
+python_testcases/test_shortest_path_length.py:34: in test1
+    assert result == 4
+E   assert 1 == 4
+____________________________________ test2 _____________________________________
+python_testcases/test_shortest_path_length.py:43: in test2
+    assert result == 7
+E   assert 10 == 7
+=========================== short test summary info ============================
+FAILED python_testcases/test_shortest_path_length.py::test1 - assert 1 == 4
+FAILED python_testcases/test_shortest_path_length.py::test2 - assert 10 == 7
+========================= 2 failed, 2 passed in 0.17s ==========================

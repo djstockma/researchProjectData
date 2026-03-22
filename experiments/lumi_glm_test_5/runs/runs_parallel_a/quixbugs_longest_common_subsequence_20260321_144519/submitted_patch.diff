@@ -1,0 +1,13 @@
+diff --git a/python_programs/longest_common_subsequence.py b/python_programs/longest_common_subsequence.py
+index dd763e5..ad0ced2 100644
+--- a/python_programs/longest_common_subsequence.py
++++ b/python_programs/longest_common_subsequence.py
+@@ -3,7 +3,7 @@ def longest_common_subsequence(a, b):
+         return ''
+ 
+     elif a[0] == b[0]:
+-        return a[0] + longest_common_subsequence(a[1:], b)
++        return a[0] + longest_common_subsequence(a[1:], b[1:])
+ 
+     else:
+         return max(

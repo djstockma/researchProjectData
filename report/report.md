@@ -235,17 +235,23 @@ Introduced the loop on a simple task.
 * Execution: milliseconds
 * Inference: about 100 seconds per step
 
+![Phase time distribution](figures/fig1_phase_pie.png)
+
 ---
 
 ### 6.3 Key observation
 
 Inference accounts for 95 to 99 percent of runtime.
 
+![Per-task phase breakdown](figures/fig2_phase_bars.png)
+
 ---
 
 ### 6.4 Context growth
 
 Later steps are slower because the prompt grows over time. A 14-step task can cost about 50 percent more per step than a short task.
+
+![Inference time vs step number](figures/fig3_inference_vs_step.png)
 
 ---
 
@@ -262,6 +268,8 @@ Later steps are slower because the prompt grows over time. A 14-step task can co
 ¹ Likely a Lustre page cache effect from preceding jobs on the same scratch path; not guaranteed to be reproducible.
 
 Adding GPUs provides no inference speedup. The only measurable benefit of 4 GPUs is faster model loading, which is amortised to near-zero over a full 40-task run. Per-task results for all three configurations are in `report/data/`.
+
+![Configuration comparison](figures/fig4_config_comparison.png)
 
 ---
 

@@ -13,6 +13,23 @@ The main result is that LLM inference dominates total runtime, accounting for 95
 
 ---
 
+## Project Timeline 
+
+| Week | Work |
+|------|------|
+| Jan 27 | Project setup, first TA meeting, LUMI access |
+| Feb 3 | TA meeting, mini-SWE-agent and SWE-bench running locally |
+| Feb 10 | First GPU inference on LUMI (Experiment 1) |
+| Feb 17 | SLURM setup, one-shot diff generation (Experiment 2) |
+| Feb 23 | Interactive agent loop (Experiment 3) |
+| Mar 9 | Agent on SWE-bench tasks, ROCm fix, container blocker (Experiment 4) |
+| Mar 16 | Switched to QuixBugs, timing instrumentation, 2GPU and 4GPU runs (Experiment 5) |
+| Mar 21 | Parallel jobs, first complete 40-task run |
+| Mar 22 | Analysis, figures, report draft |
+| Mar 26 | Report finalisation |
+
+---
+
 ## 1. Research Question
 
 **Primary question:**

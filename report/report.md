@@ -222,8 +222,9 @@ Introduced the loop on a simple task.
 
 ### Experiment 4: SWE-bench
 
-* Pipeline worked
-* Hit ROCm and container limitations
+* Pipeline worked end-to-end on real tasks
+* **ROCm crash:** GLM-4.7-Flash's MoE routing calls `torch._grouped_mm`, which exists on ROCm but is not implemented. Fixed with a one-line patch to skip the fused kernel and fall back to standard `torch.mm`.
+* **Nested container blocker:** SWE-bench requires a per-task Singularity container for the Python environment, but LUMI does not support running `singularity exec` from inside another Singularity container. No workaround preserved both GPU access and task isolation, which is why the project switched to QuixBugs.
 
 ### Experiment 5: QuixBugs timing
 
@@ -247,10 +248,14 @@ Introduced the loop on a simple task.
 
 ### 6.2 Phase timing
 
-* Model load: minutes
-* Setup: seconds
-* Execution: milliseconds
-* Inference: about 100 seconds per step
+| Phase | 2GPU | 4GPU |
+|-------|------|------|
+| Model load | 37.5 min | 19.7 min |
+| Setup (1st task) | ~27s | ~61s |
+| Setup (subsequent) | ~4s | ~5s |
+| Inference per step | ~107s | ~110s |
+| Command execution | ~0.5s | ~0.5s |
+| Final pytest | ~2s | ~2s |
 
 ![Phase time distribution](figures/fig1_phase_pie.png)
 
@@ -293,19 +298,19 @@ Adding GPUs provides no inference speedup. The only measurable benefit of 4 GPUs
 ## 7. Key Findings
 
 1. **Inference dominates runtime**
-   Almost all time is spent inside the model
+   LLM inference accounts for 95–99% of task wall time. Setup, execution, and testing combined are under 5%.
 
 2. **More GPUs do not help**
-   ROCm forces a sequential fallback
+   The ROCm fallback serialises MoE expert routing regardless of GPU count. 4 GPUs produce identical inference speed (~110s/step) to 2 GPUs (~107s/step). The only gain is 2x faster model loading.
 
 3. **Parallelism is effective**
-   Running multiple jobs increases throughput
+   Two parallel 2-GPU jobs completed all 40 tasks in 8 hours. A single 4-GPU job at the same total GPU cost completed only 26/40.
 
 4. **Context length matters**
-   Longer histories slow down inference
+   Per-step inference time grows ~50% from step 2 to step 14 as the KV cache expands.
 
 5. **Timeouts are necessary**
-   Some tasks consume disproportionate time
+   A small number of tasks consumed 30+ minutes each due to format error loops. A per-task cap is essential for predictable batch throughput.
 
 ---
 

@@ -5,6 +5,19 @@
 
 ---
 
+> ## Outstanding TODOs
+> Search for `**TODO**` in this document to find all items. Summary:
+>
+> - [x] **Figure 1** — Phase time distribution pie chart (Section 6.2)
+> - [x] **Figure 2** — Phase breakdown stacked bar chart per task (Section 6.3)
+> - [x] **Figure 3** — Inference time vs step number scatter plot (Section 6.4)
+> - [x] **Figure 4** — Configuration comparison bar chart (Section 6.7)
+> - [ ] **Discussion** — Optional paragraph: what if ROCm grouped-GEMM were fixed? (Section 8)
+> - [ ] **Conclusion** — 1–2 sentences on future directions (Section 9)
+> - [ ] **Abstract** — Final polish pass once figures are done
+
+---
+
 ## Abstract
 
 This project investigates the practical feasibility of running interactive AI coding agents on
@@ -15,7 +28,12 @@ execution, and testing) under different LUMI hardware configurations. Our primar
 is that LLM inference completely dominates wall time (95–99%), and that adding more GPUs
 does not improve inference throughput due to a ROCm kernel limitation in the MoE routing
 path of the model. Horizontal parallelism (multiple independent jobs) proves far more
-effective than vertical scaling (more GPUs per job) for maximising task throughput.
+effective than vertical scaling (more GPUs per job) for maximising task throughput. Running
+two simultaneous 2-GPU jobs completes all 40 benchmark tasks within the same wall-time
+window that a single 4-GPU job cannot — at identical total GPU cost.
+
+> **TODO (polish):** Re-read abstract once all figures are finalised — make sure the
+> numbers cited here match the figures exactly.
 
 ---
 
@@ -255,14 +273,14 @@ Full results in Section 6.
 
 ### 6.1 SLURM configurations tested
 
-| Config | Jobs | GPUs/job | Tasks/job | Total GPU-h | Output dir |
-|--------|------|----------|-----------|-------------|------------|
-| 2GPU serial | 1 | 2× MI250X | 40 | 16 | `runs_2gpu/` |
-| 4GPU serial | 1 | 4× MI250X | 40 | 32 | `runs_4gpu/` |
-| **2×2GPU parallel** | **2** | **2× MI250X** | **20 each** | **32** | `runs_parallel_a/` + `runs_parallel_b/` |
+| Config | Jobs | GPUs/job | Tasks/job | Total GPU-h | Wall limit | Output dir |
+|--------|------|----------|-----------|-------------|------------|------------|
+| 2GPU serial | 1 | 2× MI250X | 40 | 16 | 8h | `runs_2gpu/` |
+| 4GPU serial | 1 | 4× MI250X | 40 | 32 | 8h | `runs_4gpu/` |
+| **2×2GPU parallel** | **2** | **2× MI250X** | **20 each** | **32** | **8h** | `runs_parallel_a/` + `runs_parallel_b/` |
 
 The parallel configuration uses the same total GPU budget as 4GPU serial but splits the
-workload across two simultaneously-scheduled jobs.
+workload across two simultaneously-scheduled jobs, each handling half the task list.
 
 ### 6.2 Phase timing — where does the time go?
 
@@ -277,18 +295,14 @@ All timings from jobs 16888661 (2GPU) and 16888703 (4GPU), 8h wall, 24–26 task
 | Exec per step | ~0.5s | ~0.5s | Local Python |
 | Test (final pytest) | ~2s | ~2s | When not buggy |
 
-> **Figure 1 — Phase time distribution (placeholder)**
-> *Pie chart: for a typical 6-step task on 2GPU, ~97% of wall time is LLM inference,
-> ~2% is model load amortised, <1% is setup/exec/test combined.*
+![Figure 1 — Phase time distribution](figures/fig1_phase_pie.png)
 
 ### 6.3 Inference dominates
 
 For every configuration tested, LLM inference accounts for **95–99% of task wall time**.
 Setup, execution, and testing are negligible.
 
-> **Figure 2 — Phase breakdown bar chart (placeholder)**
-> *Stacked bar per task: model_time vs setup_time vs exec_time vs test_time.
-> Will be generated from runs_2gpu/ metrics when parallel job results arrive.*
+![Figure 2 — Per-task phase breakdown](figures/fig2_phase_bars.png)
 
 ### 6.4 Context growth increases inference cost
 
@@ -304,23 +318,26 @@ subsequent inference call slower:
 
 A 14-step task pays approximately **50% more per step** than a 2-step task.
 
-> **Figure 3 — Inference time vs step number (placeholder)**
-> *Scatter plot: x = step number, y = inference time (s), coloured by task.
-> Shows the linear-ish growth of per-step cost with context length.*
+![Figure 3 — Inference time vs step number](figures/fig3_inference_vs_step.png)
 
-### 6.5 2GPU vs 4GPU — inference speed is identical
+### 6.5 2GPU vs 4GPU vs 2×2GPU parallel — configuration comparison
 
-| Metric | 2GPU | 4GPU |
-|--------|------|------|
-| Avg inf/step (normal tasks) | ~107s | ~110s |
-| Model load | 37.5 min | **19.7 min** |
-| Tasks completed (8h) | 24/40 | 26/40 |
-| Solve rate | 10/24 (42%) | 9/26 (35%) |
+| Metric | 2GPU serial | 4GPU serial | 2×2GPU parallel |
+|--------|-------------|-------------|-----------------|
+| Total GPU-hours | 16 | 32 | 32 |
+| Model load | 37.5 min | 19.7 min | **4.2 min** ¹ |
+| Tasks completed (8h) | 24/40 | 26/40 | **40/40** |
+| PASS | 10/24 (42%) | 9/26 (35%) | **16/40 (40%)** |
+| Avg inf/step (normal) | ~107s | ~110s | ~107s |
+
+¹ The dramatically faster model load in the parallel jobs is likely due to the model weights
+already being hot in the Lustre filesystem page cache from the two preceding jobs on the
+same scratch path. This is a real effect but not guaranteed to be reproducible across
+different nodes or after a long gap between jobs.
 
 Adding 2 more GPUs provides **no inference speedup**. The ROCm `grouped_mm_fallback`
 serialises MoE expert routing into sequential `torch.mm` calls regardless of how many
-GPUs hold the weights. The only benefit of 4 GPUs is a 2× faster model load — because
-each chip holds a smaller weight shard and requires less per-chip IO from the Lustre cache.
+GPUs hold the weights. The only benefit of 4 GPUs is faster model loading.
 
 ### 6.6 Per-task results (2GPU serial, job 16888661)
 
@@ -358,20 +375,75 @@ context growth. These tasks consumed a disproportionate share of the 8h budget.
 
 ### 6.7 Parallel 2×2GPU results
 
-> **[PLACEHOLDER — jobs 16914578 and 16914579 pending]**
->
-> Two jobs submitted simultaneously on 2026-03-21:
-> - Job A (16914578): tasks 1–20 (`tasks_a.jsonl`) → `runs/runs_parallel_a/`
-> - Job B (16914579): tasks 21–40 (`tasks_b.jsonl`) → `runs/runs_parallel_b/`
->
-> Both: 2× MI250X, 8h wall, per-task timeout 1800s.
->
-> Expected outcome: all 40 tasks completed within the 8h window.
-> Results table and timing comparison with serial configurations to be added here.
+Two jobs submitted simultaneously (2026-03-21):
+- **Job A (16914578):** tasks 1–20 (`tasks_a.jsonl`) → `runs/runs_parallel_a/`
+- **Job B (16914579):** tasks 21–40 (`tasks_b.jsonl`) → `runs/runs_parallel_b/`
 
-> **Figure 4 — Configuration comparison (placeholder)**
-> *Bar chart: tasks completed per configuration (2GPU serial, 4GPU serial, 2×2GPU parallel)
-> and wall-clock time to complete all tasks.*
+Both: 2× MI250X, 8h wall, `--task-timeout 1800` (30 min per-task cap).
+
+**Both jobs completed all 20/20 assigned tasks** — the first complete 40-task run.
+
+| | Job A (tasks 1–20) | Job B (tasks 21–40) | Combined |
+|---|---|---|---|
+| Tasks done | 20/20 | 20/20 | **40/40** |
+| PASS | 9 (45%) | 7 (35%) | **16 (40%)** |
+| Model load | 251s (4.2 min) | 251s (4.2 min) | — |
+| Avg inf/step | ~107s | ~108s | ~107s |
+
+#### Per-task results — Job A (tasks 1–20)
+
+| Task | Result | Steps | Wall (s) | Inf/step (s) |
+|------|--------|-------|----------|--------------|
+| bitcount | **PASS** | 4 | 437 | 106 |
+| breadth_first_search | **PASS** | 6 | 647 | 107 |
+| bucketsort | **PASS** | 3 | 321 | 106 |
+| depth_first_search | FAIL | 5 | 527 | 105 |
+| detect_cycle | FAIL | 4 | 434 | 107 |
+| find_first_in_sorted | FAIL | 2 | 243 | 106 |
+| find_in_sorted | FAIL | 1 | **1997** | — ¹ |
+| flatten | **PASS** | 4 | 433 | 107 |
+| gcd | **PASS** | 4 | 437 | 108 |
+| get_factors | FAIL | 13 | 1825 | 140 |
+| hanoi | FAIL | 3 | 327 | 108 |
+| is_valid_parenthesization | **PASS** | 10 | 1235 | 123 |
+| kheapsort | **PASS** | 7 | 771 | 110 |
+| knapsack | **PASS** | 13 | 1902 | 146 |
+| kth | FAIL | 2 | 218 | 107 |
+| lcs_length | FAIL | 4 | 434 | 108 |
+| levenshtein | FAIL | 5 | **1932** | 385 ¹ |
+| lis | FAIL | 4 | 433 | 107 |
+| longest_common_subsequence | **PASS** | 13 | 1832 | 140 |
+| max_sublist_sum | FAIL | 4 | **1814** | 452 ¹ |
+
+#### Per-task results — Job B (tasks 21–40)
+
+| Task | Result | Steps | Wall (s) | Inf/step (s) |
+|------|--------|-------|----------|--------------|
+| mergesort | **PASS** | 4 | 452 | 107 |
+| minimum_spanning_tree | FAIL | 2 | 218 | 106 |
+| next_palindrome | **PASS** | 9 | 1881 | 208 |
+| next_permutation | FAIL | 4 | **1906** | 473 ¹ |
+| pascal | FAIL | 1 | **1924** | — ¹ |
+| possible_change | FAIL | 1 | **1804** | — ¹ |
+| powerset | FAIL | 5 | 544 | 108 |
+| quicksort | FAIL | 3 | **1851** | 615 ¹ |
+| reverse_linked_list | FAIL | 1 | **1957** | — ¹ |
+| rpn_eval | **PASS** | 8 | 877 | 109 |
+| shortest_path_length | FAIL | 10 | 1848 | 184 |
+| shortest_path_lengths | FAIL | 2 | 216 | 106 |
+| shortest_paths | **PASS** | 5 | 541 | 107 |
+| shunting_yard | FAIL | 7 | **1843** | 263 |
+| sieve | FAIL | 6 | 646 | 107 |
+| sqrt | FAIL | 11 | 1873 | 135 |
+| subsequences | FAIL | 5 | **1917** | 382 ¹ |
+| to_base | **PASS** | 5 | 542 | 108 |
+| topological_ordering | **PASS** | 9 | 1108 | 122 |
+| wrap | **PASS** | 5 | 553 | 110 |
+
+¹ Abnormally high wall time or inf/step — format error loop or severe context explosion.
+Tasks hitting ~1800s were cut by the per-task timeout.
+
+![Figure 4 — Configuration comparison](figures/fig4_config_comparison.png)
 
 ---
 
@@ -395,9 +467,11 @@ multiplications regardless of GPU count. This means:
 ### Finding 3: Horizontal parallelism beats vertical scaling
 
 Splitting 40 tasks across two simultaneous 2-GPU jobs completes the full benchmark
-faster than one 4-GPU job running all 40 tasks sequentially — at the same total GPU cost.
-This is the natural HPC scaling strategy: task-level parallelism over hardware-level
-parallelism.
+within the 8h wall time (40/40 tasks), while a single 4-GPU job running all tasks
+sequentially completed only 26/40 — at the same total GPU cost (32 GPU-hours). This
+is the natural HPC scaling strategy: task-level parallelism over hardware-level
+parallelism. It also uses half the per-node GPU allocation, leaving more headroom for
+other users and reducing scheduling wait time.
 
 ### Finding 4: Context length is the real inference cost driver
 
@@ -436,7 +510,13 @@ is essential for predictable batch throughput.
   may not generalise to harder tasks
 - Only one model (GLM-4.7-Flash) was tested — results are specific to this MoE
   architecture on ROCm
-- The parallel experiment results are pending (see Section 6.7)
+- The fast model load observed in the parallel jobs (4.2 min vs 37.5 min) is likely
+  a Lustre cache warming effect from prior jobs, and may not be reproducible in cold
+  conditions
+
+> **TODO (discussion):** Consider adding a short paragraph on what the results would
+> look like if the ROCm grouped-GEMM bottleneck were fixed — i.e., what inference speedup
+> would be expected with 4 GPUs on a native CUDA system.
 
 ---
 
@@ -444,12 +524,17 @@ is essential for predictable batch throughput.
 
 We successfully ran an interactive AI coding agent with a locally-hosted 32B MoE model
 on LUMI, measured the full pipeline timing at per-phase granularity, and compared multiple
-hardware configurations. The dominant finding is that LLM inference is the exclusive
-bottleneck (95–99% of wall time), and that on LUMI's AMD MI250X GPUs with the current
-ROCm software stack, vertical scaling (more GPUs per job) provides no inference throughput
-benefit. Horizontal scaling (more parallel jobs) is the correct strategy for maximising
-task throughput within a fixed GPU budget — a conclusion that generalises to any HPC
-deployment of large MoE models under similar ROCm constraints.
+hardware configurations across 40 QuixBugs benchmark tasks. The dominant finding is that
+LLM inference is the exclusive bottleneck (95–99% of wall time), and that on LUMI's AMD
+MI250X GPUs with the current ROCm software stack, vertical scaling (more GPUs per job)
+provides no inference throughput benefit due to the serialised MoE routing fallback.
+Horizontal scaling (two parallel 2-GPU jobs) completed all 40 tasks within the same 8h
+window that a single 4-GPU job could not — at identical total GPU cost — confirming that
+task-level parallelism is the correct scaling strategy for this class of workload on LUMI.
+
+> **TODO (conclusion):** Add 1–2 sentences on future directions — e.g., what would change
+> if ROCm grouped-GEMM support were added, or if the benchmark were scaled to SWE-bench
+> with a containerisation solution.
 
 ---
 

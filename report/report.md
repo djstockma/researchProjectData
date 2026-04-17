@@ -1,6 +1,6 @@
 # Scaling AI Coding Agents on LUMI
 
-**Course project report, Jens Stockmarr**
+**Course project report, Jens Stockmann**
 **Date: March 2026**
 
 ---
@@ -375,9 +375,9 @@ Two directions would be most valuable to pursue next. First, if ROCm grouped-GEM
 
 | File | Contents |
 |------|----------|
-| `report/data/results_2gpu.md` | 2GPU serial — 24 tasks, job 16888661 |
-| `report/data/results_parallel_a.md` | 2x2GPU parallel job A — tasks 1-20, job 16914578 |
-| `report/data/results_parallel_b.md` | 2x2GPU parallel job B — tasks 21-40, job 16914579 |
+| `report/data/results_2gpu.md` | 2GPU serial - 24 tasks, job 16888661 |
+| `report/data/results_parallel_a.md` | 2x2GPU parallel job A - tasks 1-20, job 16914578 |
+| `report/data/results_parallel_b.md` | 2x2GPU parallel job B - tasks 21-40, job 16914579 |
 
 ### C. LUMI lessons learned
 

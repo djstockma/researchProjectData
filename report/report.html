@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>report.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="scaling-ai-coding-agents-on-lumi">Scaling AI Coding Agents on LUMI</h1>
+<p><strong>Course project report, Jens Stockmarr</strong>
+<strong>Date: March 2026</strong></p>
+<hr>
+<h2 id="abstract">Abstract</h2>
+<p>This project investigates the practical feasibility of running interactive AI coding agents on the LUMI supercomputer using a locally hosted large language model. A minimal agent loop was implemented in which the model iteratively generates bash commands to fix bugs, evaluated on QuixBugs, a published benchmark of 40 single-line Python algorithm bugs. The system records time spent in each pipeline phase: model loading, task setup, LLM inference, command execution, and testing.</p>
+<p>The main result is that LLM inference dominates total runtime, accounting for 95 to 99 percent of wall time. Increasing GPU count from 2 to 4 does not improve inference speed due to a ROCm limitation in the mixture-of-experts routing path of the model. Running multiple jobs in parallel is far more effective: two parallel 2-GPU jobs complete all 40 tasks within the same 8-hour window that a single 4-GPU job cannot finish, at identical total GPU cost, with a 40 percent solve rate across the full benchmark.</p>
+<hr>
+<h2 id="project-timeline">Project Timeline</h2>
+<table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Jan 27</td>
+<td>Project setup, first TA meeting, LUMI access</td>
+</tr>
+<tr>
+<td>Feb 3</td>
+<td>TA meeting, mini-SWE-agent and SWE-bench running locally</td>
+</tr>
+<tr>
+<td>Feb 10</td>
+<td>First GPU inference on LUMI (Experiment 1)</td>
+</tr>
+<tr>
+<td>Feb 17</td>
+<td>SLURM setup, one-shot diff generation (Experiment 2)</td>
+</tr>
+<tr>
+<td>Feb 23</td>
+<td>Interactive agent loop (Experiment 3)</td>
+</tr>
+<tr>
+<td>Mar 9</td>
+<td>Agent on SWE-bench tasks, ROCm fix, container blocker (Experiment 4)</td>
+</tr>
+<tr>
+<td>Mar 16</td>
+<td>Switched to QuixBugs, timing instrumentation, 2GPU and 4GPU runs (Experiment 5)</td>
+</tr>
+<tr>
+<td>Mar 21</td>
+<td>Parallel jobs, first complete 40-task run</td>
+</tr>
+<tr>
+<td>Mar 22</td>
+<td>Analysis, figures, report draft</td>
+</tr>
+<tr>
+<td>Mar 26</td>
+<td>Report finalisation</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="1-research-question">1. Research Question</h2>
+<p><strong>Primary question:</strong>
+How does scaling AI coding agents on LUMI affect performance, efficiency, and solution quality when evaluated on a standard software engineering benchmark?</p>
+<p><strong>Sub-questions:</strong></p>
+<ul>
+<li>What does scaling mean for AI coding agents in practice? This includes model size, GPU count, and parallelism.</li>
+<li>Which scaling strategies actually improve throughput?</li>
+<li>What bottlenecks appear when running an LLM-based agent on HPC infrastructure?</li>
+</ul>
+<p><strong>Scope:</strong></p>
+<ul>
+<li>Running a large language model locally on LUMI GPUs</li>
+<li>Measuring timing across all pipeline phases</li>
+<li>Comparing GPU configurations (2 vs 4 GPUs)</li>
+<li>Comparing sequential and parallel execution</li>
+</ul>
+<p><strong>Out of scope:</strong></p>
+<ul>
+<li>Model training or fine-tuning</li>
+<li>Multiple agent sampling per task</li>
+<li>Human evaluation</li>
+</ul>
+<h3 id="11-model-choice-glm-47-flash">1.1 Model choice: GLM-4.7-Flash</h3>
+<p>Open weights, downloadable and runnable locally without an API. Strong instruction-following
+and structured output needed for the agent loop. Good code reasoning relative to inference
+cost. Also available on the HuggingFace Inference API (free tier), which allowed early
+experiments before GPU access was stable. Full technical details in §4.</p>
+<h3 id="12-agent-design-minimal-custom-loop">1.2 Agent design: minimal custom loop</h3>
+<p>A hand-written single-file loop rather than an existing framework. Every prompt, response,
+and timing measurement is explicit with no hidden retrying or state management. A single
+Python file with no heavy dependencies is also much easier to run inside a Singularity
+container on LUMI. The goal is to understand infrastructure scaling, not to maximise
+pass rate.</p>
+<hr>
+<h2 id="2-system-architecture">2. System Architecture</h2>
+<h3 id="21-pipeline-overview">2.1 Pipeline overview</h3>
+<p>The pipeline takes a task, runs an agent loop using a local LLM, and evaluates the result with tests.</p>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart TD
+    BENCH["📋 Benchmark tasks (QuixBugs, 40 Python bugs)"]
+    TASK["Task: description + source + test command"]
+    AGENT["🤖 Coding agent loop"]
+    LLM["🧠 GLM-4.7-Flash on LUMI GPU"]
+    ENV["🗂 Task repository copy"]
+    PATCH["📄 Git patch"]
+    EVAL["✅ pytest result"]
+    METRICS["📊 Timing metrics"]
+
+    BENCH --> TASK
+    TASK --> AGENT
+    AGENT <-->|"prompt / response"| LLM
+    AGENT <-->|"commands + output"| ENV
+    AGENT --> PATCH
+    PATCH --> EVAL
+    EVAL --> METRICS
+</div></code></pre>
+<h3 id="22-agent-loop">2.2 Agent loop</h3>
+<p>Each task is solved iteratively. The model proposes a command, it runs, and the output is fed back until a patch is submitted or the step limit is reached.</p>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart TD
+    START["Task → model"]
+    THINK["Generate bash command"]
+    RUN["Execute command"]
+    CHECK{Submit?}
+    OBS["Return output"]
+    SUBMIT["Collect diff"]
+    TEST["Run pytest"]
+    RESULT(["PASS / FAIL + metrics"])
+
+    START --> THINK
+    THINK --> RUN
+    RUN --> CHECK
+    CHECK -->|no| OBS
+    OBS --> THINK
+    CHECK -->|yes| SUBMIT
+    SUBMIT --> TEST
+    TEST --> RESULT
+</div></code></pre>
+<p><strong>Design choices:</strong></p>
+<ul>
+<li>The model is treated as a black box and loaded once per job</li>
+<li>The agent handles prompts, parsing, and execution</li>
+<li>No containers are used for tasks</li>
+<li>Correctness is determined only by pytest</li>
+</ul>
+<hr>
+<h3 id="23-lumi-execution-environment">2.3 LUMI execution environment</h3>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+    subgraph LUMI ["LUMI standard-g partition"]
+        subgraph JOB ["SLURM job"]
+            SIF["Singularity container"]
+            GPU["2–4 AMD MI250X GPUs"]
+            MODEL["GLM-4.7-Flash"]
+            AGENT2["Agent loop"]
+
+            SIF --> AGENT2
+            SIF --> MODEL
+            MODEL --- GPU
+        end
+    end
+
+    HF["Model cache"]
+    TASKS["Tasks + repo"]
+
+    HF --> MODEL
+    TASKS --> AGENT2
+</div></code></pre>
+<hr>
+<h2 id="3-benchmark-quixbugs">3. Benchmark: QuixBugs</h2>
+<h3 id="31-why-not-swe-bench">3.1 Why not SWE-bench</h3>
+<p>Two issues prevented using SWE-bench on LUMI:</p>
+<ul>
+<li>Nested containers are not supported</li>
+<li>Extracting task environments is extremely slow on Lustre</li>
+</ul>
+<p><strong>Decision:</strong> use a benchmark that runs directly in Python without containers.</p>
+<h3 id="32-quixbugs">3.2 QuixBugs</h3>
+<p>QuixBugs consists of 40 small Python programs, each containing a single bug.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tasks</td>
+<td>40</td>
+</tr>
+<tr>
+<td>Bug type</td>
+<td>Single-line logic error</td>
+</tr>
+<tr>
+<td>Evaluation</td>
+<td>pytest</td>
+</tr>
+<tr>
+<td>Dependencies</td>
+<td>Standard library</td>
+</tr>
+</tbody>
+</table>
+<p>This makes it ideal for measuring pipeline timing.</p>
+<hr>
+<h2 id="4-model-glm-47-flash">4. Model: GLM-4.7-Flash</h2>
+<p>GLM-4.7-Flash is a 32B mixture-of-experts model. It requires about 64 GB in bfloat16 format, which matches one MI250X GPU.</p>
+<h3 id="41-rocm-limitation">4.1 ROCm limitation</h3>
+<p>ROCm does not support the grouped GEMM kernel used in the model. A small patch forces a fallback implementation. This keeps the model functional but slows inference.</p>
+<h3 id="42-memory-constraints">4.2 Memory constraints</h3>
+<p>The model fills a single GPU, so at least two GPUs are needed to allow space for inference.</p>
+<hr>
+<h2 id="5-experiment-history">5. Experiment History</h2>
+<h3 id="experiment-1-first-gpu-inference-on-lumi">Experiment 1: First GPU inference on LUMI</h3>
+<p>A minimal script loaded GLM-4.7-Flash and ran a simple coding prompt as a SLURM job.</p>
+<ul>
+<li>Confirmed the model runs on LUMI's AMD GPUs via the LAIF Singularity container</li>
+<li>Key learning: LUMI modules must be re-loaded in every session and every SLURM script; they do not persist across SSH logins or compute nodes</li>
+</ul>
+<h3 id="experiment-2-one-shot-generation">Experiment 2: One-shot generation</h3>
+<p>Single prompt producing a diff.</p>
+<ul>
+<li>Worked, but inconsistent quality</li>
+<li>No evaluation step</li>
+</ul>
+<h3 id="experiment-3-interactive-agent">Experiment 3: Interactive agent</h3>
+<p>Introduced the loop on a simple task.</p>
+<ul>
+<li>API mode was fast</li>
+<li>Local GPU mode was slow due to incorrect model loading</li>
+</ul>
+<h3 id="experiment-4-swe-bench">Experiment 4: SWE-bench</h3>
+<ul>
+<li>Pipeline worked end-to-end on real tasks</li>
+<li><strong>ROCm crash:</strong> GLM-4.7-Flash's MoE routing calls <code>torch._grouped_mm</code>, which exists on ROCm but is not implemented. Fixed with a one-line patch to skip the fused kernel and fall back to standard <code>torch.mm</code>.</li>
+<li><strong>Nested container blocker:</strong> SWE-bench requires a per-task Singularity container for the Python environment, but LUMI does not support running <code>singularity exec</code> from inside another Singularity container. No workaround preserved both GPU access and task isolation, which is why the project switched to QuixBugs.</li>
+</ul>
+<h3 id="experiment-5-quixbugs-timing">Experiment 5: QuixBugs timing</h3>
+<ul>
+<li>Switched to QuixBugs</li>
+<li>Added timing instrumentation</li>
+<li>Tested multiple GPU configurations</li>
+</ul>
+<hr>
+<h2 id="6-results">6. Results</h2>
+<h3 id="61-configurations">6.1 Configurations</h3>
+<table>
+<thead>
+<tr>
+<th>Config</th>
+<th>Jobs</th>
+<th>GPUs/job</th>
+<th>Tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2 GPU serial</td>
+<td>1</td>
+<td>2</td>
+<td>40</td>
+</tr>
+<tr>
+<td>4 GPU serial</td>
+<td>1</td>
+<td>4</td>
+<td>40</td>
+</tr>
+<tr>
+<td>2×2 GPU parallel</td>
+<td>2</td>
+<td>2</td>
+<td>20 each</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="62-phase-timing">6.2 Phase timing</h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>2GPU</th>
+<th>4GPU</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model load</td>
+<td>37.5 min</td>
+<td>19.7 min</td>
+</tr>
+<tr>
+<td>Setup (1st task)</td>
+<td>~27s</td>
+<td>~61s</td>
+</tr>
+<tr>
+<td>Setup (subsequent)</td>
+<td>~4s</td>
+<td>~5s</td>
+</tr>
+<tr>
+<td>Inference per step</td>
+<td>~107s</td>
+<td>~110s</td>
+</tr>
+<tr>
+<td>Command execution</td>
+<td>~0.5s</td>
+<td>~0.5s</td>
+</tr>
+<tr>
+<td>Final pytest</td>
+<td>~2s</td>
+<td>~2s</td>
+</tr>
+</tbody>
+</table>
+<p><img src="figures/fig1_phase_pie.png" alt="Phase time distribution"></p>
+<hr>
+<h3 id="63-key-observation">6.3 Key observation</h3>
+<p>Inference accounts for 95 to 99 percent of runtime.</p>
+<p><img src="figures/fig2_phase_bars.png" alt="Per-task phase breakdown"></p>
+<hr>
+<h3 id="64-context-growth">6.4 Context growth</h3>
+<p>Later steps are slower because the prompt grows over time. A 14-step task can cost about 50 percent more per step than a short task.</p>
+<p><img src="figures/fig3_inference_vs_step.png" alt="Inference time vs step number"></p>
+<hr>
+<h3 id="65-configuration-comparison">6.5 Configuration comparison</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>2GPU serial</th>
+<th>4GPU serial</th>
+<th>2x2GPU parallel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Total GPU-hours</td>
+<td>16</td>
+<td>32</td>
+<td>32</td>
+</tr>
+<tr>
+<td>Model load</td>
+<td>37.5 min</td>
+<td>19.7 min</td>
+<td>4.2 min ¹</td>
+</tr>
+<tr>
+<td>Tasks completed (8h)</td>
+<td>24/40</td>
+<td>26/40</td>
+<td><strong>40/40</strong></td>
+</tr>
+<tr>
+<td>PASS rate</td>
+<td>10/24 (42%)</td>
+<td>9/26 (35%)</td>
+<td>16/40 (40%)</td>
+</tr>
+<tr>
+<td>Avg inf/step</td>
+<td>~107s</td>
+<td>~110s</td>
+<td>~107s</td>
+</tr>
+</tbody>
+</table>
+<p>¹ Likely a Lustre page cache effect from preceding jobs on the same scratch path; not guaranteed to be reproducible.</p>
+<p>Adding GPUs provides no inference speedup. The only measurable benefit of 4 GPUs is faster model loading, which is amortised to near-zero over a full 40-task run. Per-task results for all three configurations are in <code>report/data/</code>.</p>
+<p><img src="figures/fig4_config_comparison.png" alt="Configuration comparison"></p>
+<hr>
+<h2 id="7-key-findings">7. Key Findings</h2>
+<ol>
+<li>
+<p><strong>Inference dominates runtime</strong>
+LLM inference accounts for 95–99% of task wall time. Setup, execution, and testing combined are under 5%.</p>
+</li>
+<li>
+<p><strong>More GPUs do not help</strong>
+The ROCm fallback serialises MoE expert routing regardless of GPU count. 4 GPUs produce identical inference speed (~110s/step) to 2 GPUs (~107s/step). The only gain is 2x faster model loading.</p>
+</li>
+<li>
+<p><strong>Parallelism is effective</strong>
+Two parallel 2-GPU jobs completed all 40 tasks in 8 hours. A single 4-GPU job at the same total GPU cost completed only 26/40.</p>
+</li>
+<li>
+<p><strong>Context length matters</strong>
+Per-step inference time grows ~50% from step 2 to step 14 as the KV cache expands.</p>
+</li>
+<li>
+<p><strong>Timeouts are necessary</strong>
+A small number of tasks consumed 30+ minutes each due to format error loops. A per-task cap is essential for predictable batch throughput.</p>
+</li>
+</ol>
+<hr>
+<h2 id="8-discussion">8. Discussion</h2>
+<h3 id="what-worked">What worked</h3>
+<ul>
+<li>Stable pipeline</li>
+<li>Clean timing data</li>
+<li>Suitable benchmark</li>
+</ul>
+<h3 id="what-did-not-work">What did not work</h3>
+<ul>
+<li>SWE-bench is not feasible on LUMI GPU</li>
+<li>Extra GPUs do not speed up inference</li>
+<li>Some tasks fail consistently</li>
+</ul>
+<h3 id="limitations">Limitations</h3>
+<ul>
+<li>Benchmark is relatively simple</li>
+<li>Only one model tested</li>
+<li>Cache effects may influence results</li>
+</ul>
+<h3 id="what-if-the-rocm-grouped-gemm-limitation-were-fixed">What if the ROCm grouped-GEMM limitation were fixed?</h3>
+<p>The current bottleneck is that MoE expert routing falls back to a sequential loop on ROCm,
+which removes any benefit from having more GPUs. On a CUDA system with a working fused
+kernel, 4 GPUs would actually parallelize that routing step. Inference time would likely
+drop by a factor of 2 or more per step, which would shift the optimal configuration: a
+4-GPU job would then finish significantly faster than a 2-GPU one, and the trade-off
+between vertical and horizontal scaling would look quite different. The conclusion that
+parallelism beats vertical scaling is specific to the current ROCm fallback path, not a
+general property of this class of workload.</p>
+<hr>
+<h2 id="9-conclusion">9. Conclusion</h2>
+<p>This project demonstrates that AI coding agents can run on LUMI, but performance is dominated by inference time. Increasing GPU count does not improve speed under the current ROCm setup. The most effective scaling strategy is to run multiple smaller jobs in parallel. This approach maximises throughput while using the same total resources.</p>
+<p>Two directions would be most valuable to pursue next. First, if ROCm grouped-GEMM support were added, vertical scaling would become meaningful and the 4-GPU configuration would provide real inference gains worth re-evaluating. Second, scaling to SWE-bench would require a solution to the nested container problem on LUMI, either through upstream support for Singularity-in-Singularity or by running the agent outside the LAIF container with a different GPU access method.</p>
+<hr>
+<h2 id="appendix">Appendix</h2>
+<h3 id="a-files-and-reproducibility">A. Files and reproducibility</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>experiments/lumi_glm_test_5/test_agent.py</code></td>
+<td>Agent harness with per-phase timing</td>
+</tr>
+<tr>
+<td><code>experiments/lumi_glm_test_5/tasks.jsonl</code></td>
+<td>All 40 QuixBugs task definitions</td>
+</tr>
+<tr>
+<td><code>experiments/lumi_glm_test_5/tasks_a.jsonl</code></td>
+<td>Tasks 1-20 (parallel job A)</td>
+</tr>
+<tr>
+<td><code>experiments/lumi_glm_test_5/tasks_b.jsonl</code></td>
+<td>Tasks 21-40 (parallel job B)</td>
+</tr>
+<tr>
+<td><code>experiments/lumi_glm_test_5/run_agent_gpu.sh</code></td>
+<td>SLURM script: 2GPU serial</td>
+</tr>
+<tr>
+<td><code>experiments/lumi_glm_test_5/run_agent_gpu4.sh</code></td>
+<td>SLURM script: 4GPU serial</td>
+</tr>
+<tr>
+<td><code>experiments/lumi_glm_test_5/run_agent_gpu_a.sh</code></td>
+<td>SLURM script: parallel job A</td>
+</tr>
+<tr>
+<td><code>experiments/lumi_glm_test_5/run_agent_gpu_b.sh</code></td>
+<td>SLURM script: parallel job B</td>
+</tr>
+<tr>
+<td><code>experiments/lumi_glm_test_5/runs/</code></td>
+<td>All run outputs (metrics.json per task)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="b-per-task-results">B. Per-task results</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>report/data/results_2gpu.md</code></td>
+<td>2GPU serial — 24 tasks, job 16888661</td>
+</tr>
+<tr>
+<td><code>report/data/results_parallel_a.md</code></td>
+<td>2x2GPU parallel job A — tasks 1-20, job 16914578</td>
+</tr>
+<tr>
+<td><code>report/data/results_parallel_b.md</code></td>
+<td>2x2GPU parallel job B — tasks 21-40, job 16914579</td>
+</tr>
+</tbody>
+</table>
+<h3 id="c-lumi-lessons-learned">C. LUMI lessons learned</h3>
+<p>See <code>report/lumi_lessons.md</code> for a full practical reference covering environment setup,
+Lustre filesystem quirks, GPU/ROCm issues, the nested Singularity blocker, agent design
+pitfalls, and scheduling tips.</p>
+
+</body>
+</html>

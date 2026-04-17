@@ -22,4 +22,3 @@ See [`report/report.md`](report/report.md) for the full writeup.
 | `experiments/lumi_glm_test_4/` | Interactive agent on real SWE-bench tasks |
 | `experiments/lumi_glm_test_5/` | **Main experiment**, QuixBugs timing on LUMI |
 | `report/` | Report, figures, and per-task result tables |
-| `docs/` | Project notes and planning documents |
